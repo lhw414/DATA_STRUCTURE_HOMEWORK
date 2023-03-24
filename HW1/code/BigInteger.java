@@ -84,18 +84,18 @@ public class BigInteger
         return result_BigInteger;
     }
   
-    // public BigInteger subtract(BigInteger big)
-    // {
-    // }
+    public BigInteger subtract(BigInteger big)
+    {
+    }
   
-    // public BigInteger multiply(BigInteger big)
-    // {
-    // }
+    public BigInteger multiply(BigInteger big)
+    {
+    }
   
-    // @Override
-    // public String toString()
-    // {
-    // }
+    @Override
+    public String toString()
+    {
+    }
   
     // static BigInteger evaluate(String input) throws IllegalArgumentException
     // {
@@ -112,26 +112,26 @@ public class BigInteger
   
     public static void main(String[] args) throws Exception
     {
-        // try (InputStreamReader isr = new InputStreamReader(System.in))
-        // {
-        //     try (BufferedReader reader = new BufferedReader(isr))
-        //     {
-        //         boolean done = false;
-        //         while (!done)
-        //         {
-        //             String input = reader.readLine();
+        try (InputStreamReader isr = new InputStreamReader(System.in))
+        {
+            try (BufferedReader reader = new BufferedReader(isr))
+            {
+                boolean done = false;
+                while (!done)
+                {
+                    String input = reader.readLine();
   
-        //             try
-        //             {
-        //                 done = processInput(input);
-        //             }
-        //             catch (IllegalArgumentException e)
-        //             {
-        //                 System.err.println(MSG_INVALID_INPUT);
-        //             }
-        //         }
-        //     }
-        // }
+                    try
+                    {
+                        done = processInput(input);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.err.println(MSG_INVALID_INPUT);
+                    }
+                }
+            }
+        }
 
         //test
         BigInteger new1 = new BigInteger("15230");
