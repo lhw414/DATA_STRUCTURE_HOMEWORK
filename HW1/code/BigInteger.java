@@ -15,7 +15,7 @@ public class BigInteger
     // implement this
     public static final Pattern EXPRESSION_PATTERN = Pattern.compile("");
 
-    public Byte[] bytes = new Byte[200];
+    public byte[] bytes = new byte[200];
     public int BigInteger_length;
 
     public int getBigInteger_length() {
@@ -39,10 +39,7 @@ public class BigInteger
   
     public BigInteger(int[] num1)
     {
-        Arrays.fill(bytes, (byte) 0);
-        for (int i=0; i<num1.length; i++) {
-            bytes[i] = (byte) (num1[i]);
-        }
+        bytes = (byte[]) num1;
         setBigInteger_length(num1.length + 1);
     }
   
@@ -61,25 +58,18 @@ public class BigInteger
     public BigInteger add(BigInteger big)
     {
         int max_length = (BigInteger_length > big.getBigInteger_length()) ? BigInteger_length : big.getBigInteger_length();
-        Byte[] result = new Byte[max_length];
+        int[] result = new int[max_length+1];
         int num_sum, sum;
         int carry = 0;
         for (int i=0; i < max_length; i++) {
             num_sum = bytes[i] + big.bytes[i];
             carry = num_sum / 10;
             sum = num_sum % 10;
-            result[i] = (byte) (sum);
+            result[i] = sum;
         }
+        result[max_length] = carry;
 
-        StringBuilder sb = new StringBuilder();
-        if (carry == 1) {
-            sb.append(1);
-        }
-        for (int i=max_length-1; i>=0; i--) {
-            sb.append(result[i]);
-        }
-
-        BigInteger result_BigInteger = new BigInteger(sb.toString());
+        BigInteger result_BigInteger = new BigInteger(result);
 
         return result_BigInteger;
     }
