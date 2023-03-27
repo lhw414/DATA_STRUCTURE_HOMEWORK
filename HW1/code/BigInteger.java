@@ -94,17 +94,21 @@ public class BigInteger
             if (sub < 0) {
                 borrow = 1;
                 sub += 10;
+            } else {
+                borrow = 0;
             }
             result[i] = sub;
         }
 
         BigInteger result_BigInteger = new BigInteger(result);
-        if (result[max_length-1] == 0) {
-            result_BigInteger.BigIntegerLength = max_length - 1;
-        } else {
-            result_BigInteger.BigIntegerLength = max_length;
-        }
-        result_BigInteger.sign = this.sign;
+        for (int i=max_length-1;i>0;i--){
+            if (result[i] == 0) {
+                max_length -= 1;
+            } else {
+                break;
+            }
+        } 
+        result_BigInteger.BigIntegerLength = max_length;
 
         return result_BigInteger;
     }
@@ -128,11 +132,14 @@ public class BigInteger
         }
 
         BigInteger result_BigInteger = new BigInteger(result);
-        if (result[max_length-1] == 0) {
-            result_BigInteger.BigIntegerLength = max_length - 1;
-        } else {
-            result_BigInteger.BigIntegerLength = max_length;
-        }
+        for (int i=max_length-1;i>0;i--){
+            if (result[i] == 0) {
+                max_length -= 1;
+            } else {
+                break;
+            }
+        } 
+        result_BigInteger.BigIntegerLength = max_length;
         result_BigInteger.sign = (this.sign == big.sign) ? true : false;
         return result_BigInteger;
     }
@@ -199,25 +206,43 @@ public class BigInteger
         if (operator == '+') {
             if (bigInteger1Sign == bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
+                result.sign = bigInteger1.sign;
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
                     result = bigInteger1.subtract(bigInteger2);
+                    result.sign = bigInteger1.sign;
                 } else {
                     result = bigInteger2.subtract(bigInteger1);
+                    result.sign = bigInteger2.sign;
                 }
             }
         } else if (operator == '-') {
             if (bigInteger1Sign != bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
+                result.sign = bigInteger1.sign;
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
                     result = bigInteger1.subtract(bigInteger2);
+                    if (bigInteger1.sign) {
+                        result.sign = true;
+                    } else {
+                        result.sign = false;
+                    }
                 } else {
                     result = bigInteger2.subtract(bigInteger1);
+                    result.sign = bigInteger2.sign;
+                    if (bigInteger2.sign) {
+                        result.sign = false;
+                    } else {
+                        result.sign = true;
+                    }
                 }
             }
         } else {
             result = bigInteger1.multiply(bigInteger2);
+        }
+        if (result.BigIntegerLength == 1 && result.bytes[0] == 0) {
+            result.sign = true;
         }
   
         return result;
