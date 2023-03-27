@@ -3,8 +3,6 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.naming.spi.DirStateFactory.Result;
   
   
 public class BigInteger
@@ -65,36 +63,48 @@ public class BigInteger
     {
         int max_length = (this.BigIntegerLength > big.BigIntegerLength) ? this.BigIntegerLength : big.BigIntegerLength;
         int[] result = new int[max_length+1];
-        int num_sum, sum;
+        int numSum, sum;
         int carry = 0;
 
         for (int i=0; i<max_length; i++) {
-            num_sum = this.bytes[i] + big.bytes[i] + carry;
-            carry = num_sum / 10;
-            sum = num_sum % 10;
+            numSum = this.bytes[i] + big.bytes[i] + carry;
+            carry = numSum / 10;
+            sum = numSum % 10;
             result[i] = sum;
         }
         result[max_length] = carry;
 
         BigInteger result_BigInteger = new BigInteger(result);
         result_BigInteger.BigIntegerLength = max_length + carry;
+        result_BigInteger.sign = this.sign;
 
         return result_BigInteger;
     }
   
     public BigInteger subtract(BigInteger big)
     {
-        int max_length = (BigIntegerLength > big.BigIntegerLength) ? BigIntegerLength : big.BigIntegerLength;
+        int max_length = this.BigIntegerLength;
         int[] result = new int[max_length];
-        int numSub, sub;
+        Arrays.fill(result, 0);
+        int sub;
         int borrow = 0;
 
         for (int i=0; i<max_length; i++) {
-            // 10000
-            // 10153
+            sub = this.bytes[i] - big.bytes[i] - borrow;
+            if (sub < 0) {
+                borrow = 1;
+                sub += 10;
+            }
+            result[i] = sub;
         }
 
         BigInteger result_BigInteger = new BigInteger(result);
+        if (result[max_length-1] == 0) {
+            result_BigInteger.BigIntegerLength = max_length - 1;
+        } else {
+            result_BigInteger.BigIntegerLength = max_length;
+        }
+        result_BigInteger.sign = this.sign;
 
         return result_BigInteger;
     }
@@ -103,9 +113,27 @@ public class BigInteger
     {
         int max_length = this.BigIntegerLength + big.BigIntegerLength;
         int[] result = new int[max_length];
+        int carry = 0;
+
+        for (int i=0; i<big.BigIntegerLength; i++) {
+            for (int j=0; j<this.BigIntegerLength; j++) {
+                result[i+j] += big.bytes[i] * this.bytes[j];
+            }
+        }
+
+        for (int i=0; i<max_length; i++) {
+            result[i] += carry;
+            carry = result[i] / 10;
+            result[i] = result[i] % 10;
+        }
 
         BigInteger result_BigInteger = new BigInteger(result);
-
+        if (result[max_length-1] == 0) {
+            result_BigInteger.BigIntegerLength = max_length - 1;
+        } else {
+            result_BigInteger.BigIntegerLength = max_length;
+        }
+        result_BigInteger.sign = (this.sign == big.sign) ? true : false;
         return result_BigInteger;
     }
   
@@ -119,6 +147,24 @@ public class BigInteger
         }
 
         return sb.toString();
+    }
+
+    public boolean isBiggerThan(BigInteger big)
+    {
+        if (this.BigIntegerLength > big.BigIntegerLength) {
+            return true;
+        } else if (this.BigIntegerLength < big.BigIntegerLength) {
+            return false;
+        } else {
+            for (int i=this.BigIntegerLength-1;i>=0;i--) {
+                if (this.bytes[i] > big.bytes[i]) {
+                    return true;
+                } else if (this.bytes[i] < big.bytes[i]) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
   
     static BigInteger evaluate(String input) throws IllegalArgumentException
@@ -153,15 +199,22 @@ public class BigInteger
         if (operator == '+') {
             if (bigInteger1Sign == bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
-                result.sign = bigInteger1.sign;
             } else {
-                result = bigInteger1.subtract(bigInteger2);
+                if (bigInteger1.isBiggerThan(bigInteger2)) {
+                    result = bigInteger1.subtract(bigInteger2);
+                } else {
+                    result = bigInteger2.subtract(bigInteger1);
+                }
             }
         } else if (operator == '-') {
             if (bigInteger1Sign != bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
             } else {
-                result = bigInteger1.subtract(bigInteger2);
+                if (bigInteger1.isBiggerThan(bigInteger2)) {
+                    result = bigInteger1.subtract(bigInteger2);
+                } else {
+                    result = bigInteger2.subtract(bigInteger1);
+                }
             }
         } else {
             result = bigInteger1.multiply(bigInteger2);
