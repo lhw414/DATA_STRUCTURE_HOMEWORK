@@ -12,19 +12,19 @@ public class BigInteger
     public static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\s*([-+])?\\s*(\\d+)\\s*([+\\-*])\\s*(?:([-+])?\\s*(\\d+))?\\s*");
 
     private byte[] bytes = new byte[200];
-    private int BigIntegerLength;
+    private int len;
     private boolean sign = true;
 
-    //Getter, Setter BigIntegerLength
-    public int getBigIntegerLength() {
-        return BigIntegerLength;
+    // Getter, Setter : len
+    public int getLen() {
+        return len;
     }
 
-    public void setBigIntegerLength(int bigIntegerLength) {
-        BigIntegerLength = bigIntegerLength;
+    public void setLen(int len) {
+        this.len = len;
     }
 
-    //Getter, Setter Sign
+    // Getter, Setter : Sign
     public boolean getSign() {
         return sign;
     }
@@ -33,6 +33,7 @@ public class BigInteger
         this.sign = sign;
     }
 
+    // Constructor
     public BigInteger(int num)
     {
         Arrays.fill(this.bytes, (byte) 0);
@@ -41,7 +42,7 @@ public class BigInteger
             this.bytes[i++] = (byte) (num % 10);
             num /= 10;
         }
-        this.BigIntegerLength = i;
+        this.len = i;
     }
   
     public BigInteger(int[] num1)
@@ -50,7 +51,7 @@ public class BigInteger
         for (int i=0; i<num1.length; i++) {
             bytes[i] = (byte) (num1[i]);
         }
-        this.BigIntegerLength = num1.length + 1;
+        this.len = num1.length + 1;
     }
   
     public BigInteger(String s)
@@ -61,7 +62,7 @@ public class BigInteger
         for (int i=trimSLength-1; i>=0; i--) {
             bytes[trimSLength-1-i] = (byte) (trimS.charAt(i) - '0');
         }
-        this.BigIntegerLength = trimSLength;
+        this.len = trimSLength;
 
     }
 
@@ -73,41 +74,44 @@ public class BigInteger
         for (int i=trimSLength-1; i>=0; i--) {
             bytes[trimSLength-1-i] = (byte) (trimS.charAt(i) - '0');
         }
-        this.BigIntegerLength = trimSLength;
+        this.len = trimSLength;
         this.sign = sign;
     }
   
+    // Method : Add BigInteger
     public BigInteger add(BigInteger big)
     {
-        int max_length = (this.BigIntegerLength > big.BigIntegerLength) ? this.BigIntegerLength : big.BigIntegerLength;
-        int[] result = new int[max_length+1];
-        int numSum, sum;
+        int maxLength = (this.len > big.len) ? this.len : big.len;
+        int[] result = new int[maxLength+1];
+        int sum;
         int carry = 0;
 
-        for (int i=0; i<max_length; i++) {
-            numSum = this.bytes[i] + big.bytes[i] + carry;
-            carry = numSum / 10;
-            sum = numSum % 10;
+        for (int i=0; i<maxLength; i++) {
+            sum = this.bytes[i] + big.bytes[i] + carry;
+            carry = sum / 10;
+            sum %= 10;
             result[i] = sum;
         }
-        result[max_length] = carry;
+        result[maxLength] = carry;
 
-        BigInteger result_BigInteger = new BigInteger(result);
-        result_BigInteger.setBigIntegerLength(max_length + carry);
-        result_BigInteger.setSign(this.sign);
+        // Set result length, sign
+        BigInteger resultBigInteger = new BigInteger(result);
+        resultBigInteger.setLen(maxLength + carry);
+        resultBigInteger.setSign(this.sign);
 
-        return result_BigInteger;
+        return resultBigInteger;
     }
   
-    public BigInteger subtract(BigInteger big)
+    // Method : Subtract BigInteger
+    public BigInteger subtract(BigInteger big, Boolean resultSign)
     {
-        int max_length = this.BigIntegerLength;
-        int[] result = new int[max_length];
-        Arrays.fill(result, 0);
+        int maxLength = this.len;
+        int[] result = new int[maxLength];
         int sub;
         int borrow = 0;
-
-        for (int i=0; i<max_length; i++) {
+        
+        Arrays.fill(result, 0);
+        for (int i=0; i<maxLength; i++) {
             sub = this.bytes[i] - big.bytes[i] - borrow;
             if (sub < 0) {
                 borrow = 1;
@@ -118,51 +122,55 @@ public class BigInteger
             result[i] = sub;
         }
 
-        for (int i=max_length-1;i>0;i--){
+        for (int i=maxLength-1;i>0;i--){
             if (result[i] == 0) {
-                max_length -= 1;
+                maxLength -= 1;
             } else {
                 break;
             }
         } 
 
-        BigInteger result_BigInteger = new BigInteger(result);
-        result_BigInteger.setBigIntegerLength(max_length);
+        //Set result length, sign
+        BigInteger resultBigInteger = new BigInteger(result);
+        resultBigInteger.setLen(maxLength);
+        resultBigInteger.setSign(resultSign);
 
-        return result_BigInteger;
+        return resultBigInteger;
     }
   
+    // Method : Multiply BigInteger
     public BigInteger multiply(BigInteger big)
     {
-        int max_length = this.BigIntegerLength + big.BigIntegerLength;
-        int[] result = new int[max_length];
+        int maxLength = this.len + big.len;
+        int[] result = new int[maxLength];
         int carry = 0;
 
-        for (int i=0; i<big.BigIntegerLength; i++) {
-            for (int j=0; j<this.BigIntegerLength; j++) {
+        for (int i=0; i<big.len; i++) {
+            for (int j=0; j<this.len; j++) {
                 result[i+j] += big.bytes[i] * this.bytes[j];
             }
         }
 
-        for (int i=0; i<max_length; i++) {
+        for (int i=0; i<maxLength; i++) {
             result[i] += carry;
             carry = result[i] / 10;
             result[i] = result[i] % 10;
         }
 
-        for (int i=max_length-1;i>0;i--){
+        for (int i=maxLength-1;i>0;i--){
             if (result[i] == 0) {
-                max_length -= 1;
+                maxLength -= 1;
             } else {
                 break;
             }
         } 
 
-        BigInteger result_BigInteger = new BigInteger(result);
-        result_BigInteger.setBigIntegerLength(max_length);
-        result_BigInteger.setSign((this.sign == big.sign) ? true : false);
+        //Set result length, sign
+        BigInteger resultBigInteger = new BigInteger(result);
+        resultBigInteger.setLen(maxLength);
+        resultBigInteger.setSign((this.sign == big.sign) ? true : false);
 
-        return result_BigInteger;
+        return resultBigInteger;
     }
   
     @Override
@@ -170,21 +178,22 @@ public class BigInteger
     {
         StringBuilder sb = new StringBuilder();
         if(!sign) {sb.append("-");}
-        for (int i=this.BigIntegerLength-1; i>=0; i--) {
+        for (int i=this.len-1; i>=0; i--) {
             sb.append(bytes[i]);
         }
 
         return sb.toString();
     }
 
+    // Method : compare two bigInteger's abs value
     public boolean isBiggerThan(BigInteger big)
     {
-        if (this.BigIntegerLength > big.BigIntegerLength) {
+        if (this.len > big.len) {
             return true;
-        } else if (this.BigIntegerLength < big.BigIntegerLength) {
+        } else if (this.len < big.len) {
             return false;
         } else {
-            for (int i=this.BigIntegerLength-1;i>=0;i--) {
+            for (int i=this.len-1;i>=0;i--) {
                 if (this.bytes[i] > big.bytes[i]) {
                     return true;
                 } else if (this.bytes[i] < big.bytes[i]) {
@@ -195,6 +204,7 @@ public class BigInteger
         return false;
     }
   
+    // Method : split input and evaluate bigInteger value
     static BigInteger evaluate(String input) throws IllegalArgumentException
     {
         //Init value
@@ -225,16 +235,15 @@ public class BigInteger
         BigInteger bigInteger2 = new BigInteger(bigIntegerStr2, (bigInteger2Sign == '+') ? true : false);
         BigInteger result;
 
+        // Calculate two bigInteger
         if (operator == '+') {
             if (bigInteger1Sign == bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
-                    result = bigInteger1.subtract(bigInteger2);
-                    result.setSign(bigInteger1.getSign());
+                    result = bigInteger1.subtract(bigInteger2, bigInteger1.getSign());
                 } else {
-                    result = bigInteger2.subtract(bigInteger1);
-                    result.setSign(bigInteger2.getSign());
+                    result = bigInteger2.subtract(bigInteger1, bigInteger2.getSign());
                 }
             }
         } else if (operator == '-') {
@@ -242,11 +251,9 @@ public class BigInteger
                 result = bigInteger1.add(bigInteger2);
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
-                    result = bigInteger1.subtract(bigInteger2);
-                    result.setSign(bigInteger1.getSign());
+                    result = bigInteger1.subtract(bigInteger2, bigInteger1.getSign());
                 } else {
-                    result = bigInteger2.subtract(bigInteger1);
-                    result.setSign(!bigInteger2.getSign());
+                    result = bigInteger2.subtract(bigInteger1, !bigInteger2.getSign());
                 }
             }
         } else {
@@ -254,7 +261,7 @@ public class BigInteger
         }
         
         //If zero, make sign plus
-        if (result.BigIntegerLength == 1 && result.bytes[0] == 0) {
+        if (result.len == 1 && result.bytes[0] == 0) {
             result.sign = true;
         }
   
