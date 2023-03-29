@@ -11,9 +11,27 @@ public class BigInteger
     public static final String MSG_INVALID_INPUT = "Wrong Input";
     public static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\s*([-+])?\\s*(\\d+)\\s*([+\\-*])\\s*(?:([-+])?\\s*(\\d+))?\\s*");
 
-    public byte[] bytes = new byte[200];
-    public int BigIntegerLength;
-    public boolean sign = true;
+    private byte[] bytes = new byte[200];
+    private int BigIntegerLength;
+    private boolean sign = true;
+
+    //Getter, Setter BigIntegerLength
+    public int getBigIntegerLength() {
+        return BigIntegerLength;
+    }
+
+    public void setBigIntegerLength(int bigIntegerLength) {
+        BigIntegerLength = bigIntegerLength;
+    }
+
+    //Getter, Setter Sign
+    public boolean getSign() {
+        return sign;
+    }
+
+    public void setSign(boolean sign) {
+        this.sign = sign;
+    }
 
     public BigInteger(int num)
     {
@@ -38,24 +56,24 @@ public class BigInteger
     public BigInteger(String s)
     {
         Arrays.fill(bytes, (byte) 0);
-        String trim_s = s.trim();
-        int trim_s_length = trim_s.length();
-        for (int i=trim_s_length-1; i>=0; i--) {
-            bytes[trim_s_length-1-i] = (byte) (trim_s.charAt(i) - '0');
+        String trimS = s.trim();
+        int trimSLength = trimS.length();
+        for (int i=trimSLength-1; i>=0; i--) {
+            bytes[trimSLength-1-i] = (byte) (trimS.charAt(i) - '0');
         }
-        this.BigIntegerLength = trim_s_length;
+        this.BigIntegerLength = trimSLength;
 
     }
 
     public BigInteger(String s, Boolean sign)
     {
         Arrays.fill(bytes, (byte) 0);
-        String trim_s = s.trim();
-        int trim_s_length = trim_s.length();
-        for (int i=trim_s_length-1; i>=0; i--) {
-            bytes[trim_s_length-1-i] = (byte) (trim_s.charAt(i) - '0');
+        String trimS = s.trim();
+        int trimSLength = trimS.length();
+        for (int i=trimSLength-1; i>=0; i--) {
+            bytes[trimSLength-1-i] = (byte) (trimS.charAt(i) - '0');
         }
-        this.BigIntegerLength = trim_s_length;
+        this.BigIntegerLength = trimSLength;
         this.sign = sign;
     }
   
@@ -75,8 +93,8 @@ public class BigInteger
         result[max_length] = carry;
 
         BigInteger result_BigInteger = new BigInteger(result);
-        result_BigInteger.BigIntegerLength = max_length + carry;
-        result_BigInteger.sign = this.sign;
+        result_BigInteger.setBigIntegerLength(max_length + carry);
+        result_BigInteger.setSign(this.sign);
 
         return result_BigInteger;
     }
@@ -100,7 +118,6 @@ public class BigInteger
             result[i] = sub;
         }
 
-        BigInteger result_BigInteger = new BigInteger(result);
         for (int i=max_length-1;i>0;i--){
             if (result[i] == 0) {
                 max_length -= 1;
@@ -108,7 +125,9 @@ public class BigInteger
                 break;
             }
         } 
-        result_BigInteger.BigIntegerLength = max_length;
+
+        BigInteger result_BigInteger = new BigInteger(result);
+        result_BigInteger.setBigIntegerLength(max_length);
 
         return result_BigInteger;
     }
@@ -131,7 +150,6 @@ public class BigInteger
             result[i] = result[i] % 10;
         }
 
-        BigInteger result_BigInteger = new BigInteger(result);
         for (int i=max_length-1;i>0;i--){
             if (result[i] == 0) {
                 max_length -= 1;
@@ -139,8 +157,11 @@ public class BigInteger
                 break;
             }
         } 
-        result_BigInteger.BigIntegerLength = max_length;
-        result_BigInteger.sign = (this.sign == big.sign) ? true : false;
+
+        BigInteger result_BigInteger = new BigInteger(result);
+        result_BigInteger.setBigIntegerLength(max_length);
+        result_BigInteger.setSign((this.sign == big.sign) ? true : false);
+
         return result_BigInteger;
     }
   
@@ -199,6 +220,7 @@ public class BigInteger
             bigIntegerStr2 = matcher.group(5);
         }
 
+        // BigInteger Instance
         BigInteger bigInteger1 = new BigInteger(bigIntegerStr1, (bigInteger1Sign == '+') ? true : false);
         BigInteger bigInteger2 = new BigInteger(bigIntegerStr2, (bigInteger2Sign == '+') ? true : false);
         BigInteger result;
@@ -206,41 +228,32 @@ public class BigInteger
         if (operator == '+') {
             if (bigInteger1Sign == bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
-                result.sign = bigInteger1.sign;
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
                     result = bigInteger1.subtract(bigInteger2);
-                    result.sign = bigInteger1.sign;
+                    result.setSign(bigInteger1.getSign());
                 } else {
                     result = bigInteger2.subtract(bigInteger1);
-                    result.sign = bigInteger2.sign;
+                    result.setSign(bigInteger2.getSign());
                 }
             }
         } else if (operator == '-') {
             if (bigInteger1Sign != bigInteger2Sign) {
                 result = bigInteger1.add(bigInteger2);
-                result.sign = bigInteger1.sign;
             } else {
                 if (bigInteger1.isBiggerThan(bigInteger2)) {
                     result = bigInteger1.subtract(bigInteger2);
-                    if (bigInteger1.sign) {
-                        result.sign = true;
-                    } else {
-                        result.sign = false;
-                    }
+                    result.setSign(bigInteger1.getSign());
                 } else {
                     result = bigInteger2.subtract(bigInteger1);
-                    result.sign = bigInteger2.sign;
-                    if (bigInteger2.sign) {
-                        result.sign = false;
-                    } else {
-                        result.sign = true;
-                    }
+                    result.setSign(!bigInteger2.getSign());
                 }
             }
         } else {
             result = bigInteger1.multiply(bigInteger2);
         }
+        
+        //If zero, make sign plus
         if (result.BigIntegerLength == 1 && result.bytes[0] == 0) {
             result.sign = true;
         }
