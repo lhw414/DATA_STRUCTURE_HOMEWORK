@@ -37,12 +37,12 @@ public class BigInteger
     public BigInteger(int num)
     {
         Arrays.fill(this.bytes, (byte) 0);
-        int i = 0;
+        int numLen = 0;
         while(num != 0){
-            this.bytes[i++] = (byte) (num % 10);
+            this.bytes[numLen++] = (byte) (num % 10);
             num /= 10;
         }
-        this.len = i;
+        this.len = numLen;
     }
   
     public BigInteger(int[] num1)
@@ -85,7 +85,8 @@ public class BigInteger
         int[] result = new int[maxLength+1];
         int sum;
         int carry = 0;
-
+        
+        // Add bottom-up
         for (int i=0; i<maxLength; i++) {
             sum = this.bytes[i] + big.bytes[i] + carry;
             carry = sum / 10;
@@ -109,8 +110,10 @@ public class BigInteger
         int[] result = new int[maxLength];
         int sub;
         int borrow = 0;
-        
+
         Arrays.fill(result, 0);
+
+        // Subtract bottom-up
         for (int i=0; i<maxLength; i++) {
             sub = this.bytes[i] - big.bytes[i] - borrow;
             if (sub < 0) {
@@ -122,6 +125,7 @@ public class BigInteger
             result[i] = sub;
         }
 
+        // Check result length
         for (int i=maxLength-1;i>0;i--){
             if (result[i] == 0) {
                 maxLength -= 1;
@@ -145,18 +149,23 @@ public class BigInteger
         int[] result = new int[maxLength];
         int carry = 0;
 
+        Arrays.fill(result, 0);
+
+        // Multiply bottom-up
         for (int i=0; i<big.len; i++) {
             for (int j=0; j<this.len; j++) {
                 result[i+j] += big.bytes[i] * this.bytes[j];
             }
         }
 
+        // Add carry to upper position
         for (int i=0; i<maxLength; i++) {
             result[i] += carry;
             carry = result[i] / 10;
             result[i] = result[i] % 10;
         }
 
+        // Check result length
         for (int i=maxLength-1;i>0;i--){
             if (result[i] == 0) {
                 maxLength -= 1;
@@ -262,7 +271,7 @@ public class BigInteger
         
         //If zero, make sign plus
         if (result.len == 1 && result.bytes[0] == 0) {
-            result.sign = true;
+            result.setSign(true);
         }
   
         return result;
