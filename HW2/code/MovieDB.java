@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  * 유지하는 데이터베이스이다. 
  */
 public class MovieDB {
-	MyLinkedList<MyLinkedList<MovieDBItem>> movieDBList;
+	MyLinkedList<MovieList> movieDBList;
 
     public MovieDB() {
         movieDBList = new MyLinkedList<>();
@@ -16,12 +16,12 @@ public class MovieDB {
 
     public void insert(MovieDBItem item) {
         // Insert the given item to the MovieDB.
-		Iterator<MyLinkedList<MovieDBItem>> movieDBIterator = movieDBList.iterator();
+		Iterator<MovieList> movieListIterator = movieDBList.iterator();
 		MyLinkedList<MovieDBItem> movieDBListOfGenre;
 		Iterator<MovieDBItem> movieDBIteratorOfGenre;
 		Node<MyLinkedList<MovieDBItem>> prevList;
 
-		while (movieDBIterator.hasNext()) {
+		while (movieListIterator.hasNext()) {
 			movieDBListOfGenre = movieDBIterator.next();
 			movieDBIteratorOfGenre = movieDBListOfGenre.iterator();
 			prevList = null;
@@ -108,19 +108,24 @@ public class MovieDB {
 }
 
 class Genre extends Node<String> implements Comparable<Genre> {
-	public Genre(String name) {
-		super(name);
-		throw new UnsupportedOperationException("not implemented yet");
+	private String genre;
+	private Node<String> next;
+
+	public Genre(String genre) {
+		super(genre);
 	}
 	
 	@Override
 	public int compareTo(Genre o) {
-		throw new UnsupportedOperationException("not implemented yet");
+		return genre.compareTo(o.getItem());
 	}
 
 	@Override
 	public int hashCode() {
-		throw new UnsupportedOperationException("not implemented yet");
+		final int prime = 31;
+        int result = 1;
+        result = prime * result + ((genre == null) ? 0 : genre.hashCode());
+        return result;
 	}
 
 	@Override
@@ -130,36 +135,46 @@ class Genre extends Node<String> implements Comparable<Genre> {
 }
 
 class MovieList implements ListInterface<String> {	
-	public MovieList() {
+	//head is genre node
+	Node<String> head;
+	int numItems;
+
+	public MovieList(String genre) {
+		head = new Genre(genre);
 	}
 
 	@Override
 	public Iterator<String> iterator() {
-		throw new UnsupportedOperationException("not implemented yet");
+		return new MyLinkedListIterator<String>(this)
 	}
 
 	@Override
 	public boolean isEmpty() {
-		throw new UnsupportedOperationException("not implemented yet");
+		return head.getNext() == null;
 	}
 
 	@Override
 	public int size() {
-		throw new UnsupportedOperationException("not implemented yet");
+		return numItems; 
 	}
 
 	@Override
 	public void add(String item) {
-		throw new UnsupportedOperationException("not implemented yet");
+		Node<String> last = head;
+		while(last.getNext() != null) {
+			last = last.getNext();
+		}
+		last.insertNext(item);
+		this.numItems += 1;
 	}
 
 	@Override
 	public String first() {
-		throw new UnsupportedOperationException("not implemented yet");
+		return head.getNext().getItem();
 	}
 
 	@Override
 	public void removeAll() {
-		throw new UnsupportedOperationException("not implemented yet");
+		head.setNext(null);
 	}
 }
