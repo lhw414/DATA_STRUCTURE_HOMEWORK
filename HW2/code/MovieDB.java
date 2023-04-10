@@ -8,16 +8,49 @@ import java.util.NoSuchElementException;
  * 유지하는 데이터베이스이다. 
  */
 public class MovieDB {
+	MyLinkedList<MyLinkedList<MovieDBItem>> movieDBList;
+
     public MovieDB() {
-        // FIXME implement this
-    	
-    	// HINT: MovieDBGenre 클래스를 정렬된 상태로 유지하기 위한 
-    	// MyLinkedList 타입의 멤버 변수를 초기화 한다.
+        movieDBList = new MyLinkedList<>();
     }
 
     public void insert(MovieDBItem item) {
-        // FIXME implement this
         // Insert the given item to the MovieDB.
+		Iterator<MyLinkedList<MovieDBItem>> movieDBIterator = movieDBList.iterator();
+		MyLinkedList<MovieDBItem> movieDBListOfGenre;
+		Iterator<MovieDBItem> movieDBIteratorOfGenre;
+		Node<MyLinkedList<MovieDBItem>> prevList;
+
+		while (movieDBIterator.hasNext()) {
+			movieDBListOfGenre = movieDBIterator.next();
+			movieDBIteratorOfGenre = movieDBListOfGenre.iterator();
+			prevList = null;
+			// Item's genre equal to list's genre 			
+			if (movieDBListOfGenre.first().getGenre().compareTo(item.getGenre()) == 0) {
+				Node<MovieDBItem> prevNode = null;
+				Node<MovieDBItem> currNode = movieDBListOfGenre.head;
+				int compareResult = -1;
+				while (movieDBIteratorOfGenre.hasNext()) {
+					compareResult = movieDBIteratorOfGenre.next().compareTo(item);
+					if (compareResult >= 0) {
+						break;
+					}
+					prevNode = currNode;
+					currNode = currNode.getNext();
+				}
+				if (compareResult != 0) {
+					Node<MovieDBItem> newNode = new Node<MovieDBItem>(item);
+					currNode.setNext(newNode);
+				}
+			}
+			// Can't find item's genre
+			if (movieDBListOfGenre.first().getGenre().compareTo(item.getGenre()) > 0) {
+				break;
+			}
+			prevList = movieDBListOfGenre;
+		}
+
+		prevList.setNext(prevList);
 
     	// Printing functionality is provided for the sake of debugging.
         // This code should be removed before submitting your work.
