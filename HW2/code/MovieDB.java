@@ -1,5 +1,4 @@
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Genre, Title 을 관리하는 영화 데이터베이스.
@@ -8,144 +7,151 @@ import java.util.NoSuchElementException;
  * 유지하는 데이터베이스이다. 
  */
 public class MovieDB {
-	MyLinkedList<MovieList> movieDBList;
+
+	MyLinkedList<String> movieDBList;
 
     public MovieDB() {
-        movieDBList = new MyLinkedList<>();
+        movieDBList = new MyLinkedList<String>();
     }
 
     public void insert(MovieDBItem item) {
         // Insert the given item to the MovieDB.
-		Iterator<MovieList> movieListIterator = movieDBList.iterator();
-		MyLinkedList<MovieDBItem> movieDBListOfGenre;
-		Iterator<MovieDBItem> movieDBIteratorOfGenre;
-		Node<MyLinkedList<MovieDBItem>> prevList;
+		MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
+		Genre currGenre = (Genre) movieDBList.head;
+		String currGenreTitle;
+		Boolean canFindCorrectGenre = false;
 
-		while (movieListIterator.hasNext()) {
-			movieDBListOfGenre = movieDBIterator.next();
-			movieDBIteratorOfGenre = movieDBListOfGenre.iterator();
-			prevList = null;
-			// Item's genre equal to list's genre 			
-			if (movieDBListOfGenre.first().getGenre().compareTo(item.getGenre()) == 0) {
-				Node<MovieDBItem> prevNode = null;
-				Node<MovieDBItem> currNode = movieDBListOfGenre.head;
-				int compareResult = -1;
-				while (movieDBIteratorOfGenre.hasNext()) {
-					compareResult = movieDBIteratorOfGenre.next().compareTo(item);
-					if (compareResult >= 0) {
+		//search genre
+		while(genreIterator.hasNext()) {
+			currGenreTitle = genreIterator.next();
+			//find correct genre
+			if(currGenreTitle == item.getGenre()) {
+				currGenre = (Genre) genreIterator.getCurrNode();
+				MovieList movieList = currGenre.movielist;
+				MovieListIterator movieListIterator = (MovieListIterator) movieList.iterator();
+				Node<String> prevMovie = movieList.head;
+				String currMovieTitle;
+				Boolean sameMovieInList = false;
+				canFindCorrectGenre = true;
+
+				while(movieListIterator.hasNext()) {
+					currMovieTitle = movieListIterator.next();
+					if (currMovieTitle == item.getTitle()) {
+						sameMovieInList = true;
 						break;
+					} else if (currMovieTitle.compareTo(item.getTitle()) > 0) {
+						prevMovie = movieListIterator.getprevNode();
 					}
-					prevNode = currNode;
-					currNode = currNode.getNext();
 				}
-				if (compareResult != 0) {
-					Node<MovieDBItem> newNode = new Node<MovieDBItem>(item);
-					currNode.setNext(newNode);
+
+				if (!sameMovieInList) {
+					Node<String> newNode = new Node<>(item.getTitle());
+					prevMovie.setNext(newNode);
+					movieList.numItems += 1;
 				}
-			}
-			// Can't find item's genre
-			if (movieDBListOfGenre.first().getGenre().compareTo(item.getGenre()) > 0) {
+
+			} else if (currGenre.getItem().compareTo(item.getGenre()) > 0) {
+				currGenre = (Genre) genreIterator.getprevNode();
 				break;
 			}
-			prevList = movieDBListOfGenre;
 		}
 
-		prevList.setNext(prevList);
-
-    	// Printing functionality is provided for the sake of debugging.
-        // This code should be removed before submitting your work.
-        System.err.printf("[trace] MovieDB: INSERT [%s] [%s]\n", item.getGenre(), item.getTitle());
+		if(!canFindCorrectGenre) {
+			Genre newGenre = new Genre(item.getGenre());
+			currGenre.setNext(newGenre);
+			newGenre.movielist.add(item.getTitle());
+		}
     }
 
     public void delete(MovieDBItem item) {
-        // FIXME implement this
-        // Remove the given item from the MovieDB.
-    	
-    	// Printing functionality is provided for the sake of debugging.
-        // This code should be removed before submitting your work.
-        System.err.printf("[trace] MovieDB: DELETE [%s] [%s]\n", item.getGenre(), item.getTitle());
+
+        MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
+		Genre currGenre = (Genre) movieDBList.head;
+
+		while(genreIterator.hasNext()) {
+			if (genreIterator.next() == item.getGenre()) {
+				currGenre = (Genre) genreIterator.getCurrNode();
+				MovieList movieList = currGenre.movielist;
+				MovieListIterator movieListIterator = (MovieListIterator) movieList.iterator();
+				Node<String> prevMovie = movieList.head;
+
+				while(movieListIterator.hasNext()) {
+					if (movieListIterator.next() == item.getTitle()) {
+						prevMovie.removeNext();
+						movieList.numItems -= 1;
+						break;
+					}
+				}
+
+				break;
+			}
+		}
     }
 
     public MyLinkedList<MovieDBItem> search(String term) {
-        // FIXME implement this
-        // Search the given term from the MovieDB.
-        // You should return a linked list of MovieDBItem.
-        // The search command is handled at SearchCmd class.
-    	
-    	// Printing search results is the responsibility of SearchCmd class. 
-    	// So you must not use System.out in this method to achieve specs of the assignment.
-    	
-        // This tracing functionality is provided for the sake of debugging.
-        // This code should be removed before submitting your work.
-    	System.err.printf("[trace] MovieDB: SEARCH [%s]\n", term);
-    	
-    	// FIXME remove this code and return an appropriate MyLinkedList<MovieDBItem> instance.
-    	// This code is supplied for avoiding compilation error.   
+
         MyLinkedList<MovieDBItem> results = new MyLinkedList<MovieDBItem>();
+    	MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
+		Genre currGenre = (Genre) movieDBList.head;
+		MovieListIterator movieListIterator;
+		String movieTitle;
+		
+    	while(genreIterator.hasNext()) {
+			currGenre = (Genre) genreIterator.getCurrNode();
+			movieListIterator = (MovieListIterator) currGenre.movielist.iterator();
+
+			while(movieListIterator.hasNext()) {
+				movieTitle = movieListIterator.next();
+				if(movieTitle.contains(term)) {
+					results.add(new MovieDBItem(currGenre.getItem(), movieTitle));
+				}
+			}
+		}
 
         return results;
     }
     
     public MyLinkedList<MovieDBItem> items() {
-        // FIXME implement this
-        // Search the given term from the MovieDatabase.
-        // You should return a linked list of QueryResult.
-        // The print command is handled at PrintCmd class.
 
-    	// Printing movie items is the responsibility of PrintCmd class. 
-    	// So you must not use System.out in this method to achieve specs of the assignment.
-
-    	// Printing functionality is provided for the sake of debugging.
-        // This code should be removed before submitting your work.
-        System.err.printf("[trace] MovieDB: ITEMS\n");
-
-    	// FIXME remove this code and return an appropriate MyLinkedList<MovieDBItem> instance.
-    	// This code is supplied for avoiding compilation error.   
         MyLinkedList<MovieDBItem> results = new MyLinkedList<MovieDBItem>();
+    	MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
+		Genre currGenre = (Genre) movieDBList.head;
+		MovieListIterator movieListIterator;
+		
+    	while(genreIterator.hasNext()) {
+			currGenre = (Genre) genreIterator.getCurrNode();
+			movieListIterator = (MovieListIterator) currGenre.movielist.iterator();
+
+			while(movieListIterator.hasNext()) {
+				results.add(new MovieDBItem(currGenre.getItem(), movieListIterator.next()));
+			}
+		}
         
     	return results;
     }
 }
 
-class Genre extends Node<String> implements Comparable<Genre> {
+class Genre extends Node<String>{
 	MovieList movielist;
 
 	public Genre(String genre) {
 		super(genre);
-		movielist = new MovieList(genre)
-	}
-	
-	@Override
-	public int compareTo(Genre o) {
-		return genre.compareTo(o.getItem());
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-        int result = 1;
-        result = prime * result + ((genre == null) ? 0 : genre.hashCode());
-        return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		throw new UnsupportedOperationException("not implemented yet");
+		movielist = new MovieList();
 	}
 }
 
 class MovieList implements ListInterface<String> {	
-	//head is genre node
+	//dummy head
 	Node<String> head;
 	int numItems;
 
-	public MovieList(String genre) {
+	public MovieList() {
 		head = new Node<String>(null);
 	}
 
 	@Override
 	public Iterator<String> iterator() {
-		return new MyLinkedListIterator<String>(this)
+		return new MovieListIterator(this);
 	}
 
 	@Override

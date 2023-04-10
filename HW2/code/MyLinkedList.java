@@ -87,6 +87,62 @@ class MyLinkedListIterator<T> implements Iterator<T> {
 		return curr.getItem();
 	}
 
+	public Node<T> getprevNode() {
+		return prev;
+	}
+
+	public Node<T> getCurrNode() {
+		return curr;
+	}
+
+	@Override
+	public void remove() {
+		if (prev == null)
+			throw new IllegalStateException("next() should be called first");
+		if (curr == null)
+			throw new NoSuchElementException();
+		prev.removeNext();
+		list.numItems -= 1;
+		curr = prev;
+		prev = null;
+	}
+}
+
+class MovieListIterator implements Iterator<String> {
+	private MovieList list;
+	private Node<String> curr;
+	private Node<String> prev;
+
+	public MovieListIterator(MovieList list) {
+		this.list = list;
+		this.curr = list.head;
+		this.prev = null;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return curr.getNext() != null;
+	}
+
+	@Override
+	public String next() {
+		if (!hasNext())
+			throw new NoSuchElementException();
+
+		prev = curr;
+		curr = curr.getNext();
+
+		return curr.getItem();
+	}
+
+	public Node<String> getprevNode() {
+		return prev;
+	}
+
+	public Node<String> getCurrNode() {
+		return curr;
+	}
+
 	@Override
 	public void remove() {
 		if (prev == null)
