@@ -108,11 +108,11 @@ public class MovieDB {
 }
 
 class Genre extends Node<String> implements Comparable<Genre> {
-	private String genre;
-	private Node<String> next;
+	MovieList movielist;
 
 	public Genre(String genre) {
 		super(genre);
+		movielist = new MovieList(genre)
 	}
 	
 	@Override
@@ -140,7 +140,7 @@ class MovieList implements ListInterface<String> {
 	int numItems;
 
 	public MovieList(String genre) {
-		head = new Genre(genre);
+		head = new Node<String>(null);
 	}
 
 	@Override
