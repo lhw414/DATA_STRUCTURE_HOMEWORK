@@ -8,102 +8,112 @@ import java.util.Iterator;
  */
 public class MovieDB {
 
-	MyLinkedList<String> movieDBList;
+	MyLinkedList<Genre> movieDBList;
 
     public MovieDB() {
-        movieDBList = new MyLinkedList<String>();
+        movieDBList = new MyLinkedList<Genre>();
     }
 
     public void insert(MovieDBItem item) {
         // Insert the given item to the MovieDB.
-		MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
-		Genre currGenre = (Genre) movieDBList.head;
-		String currGenreTitle;
 		Boolean canFindCorrectGenre = false;
+		Node<Genre> prevGenre = null;
+		Node<Genre> currGenre = movieDBList.head;
 
-		//search genre
-		while(genreIterator.hasNext()) {
-			currGenreTitle = genreIterator.next();
-			//find correct genre
-			if(currGenreTitle == item.getGenre()) {
-				currGenre = (Genre) genreIterator.getCurrNode();
-				MovieList movieList = currGenre.movielist;
-				MovieListIterator movieListIterator = (MovieListIterator) movieList.iterator();
-				Node<String> prevMovie = movieList.head;
-				String currMovieTitle;
+		for (Genre genre : movieDBList) {
+			prevGenre = currGenre;
+			currGenre = currGenre.getNext();
+			if(genre.getItem() == item.getGenre()) {
 				Boolean sameMovieInList = false;
+				Node<String> prevMovie = null;
+				Node<String> currMovie = genre.movielist.head;
 				canFindCorrectGenre = true;
 
-				while(movieListIterator.hasNext()) {
-					currMovieTitle = movieListIterator.next();
-					if (currMovieTitle == item.getTitle()) {
+				for (String title : genre.movielist) {
+					prevMovie = currMovie;
+					currMovie = currMovie.getNext();
+					if(title == item.getTitle()) {
 						sameMovieInList = true;
 						break;
-					} else if (currMovieTitle.compareTo(item.getTitle()) > 0) {
-						prevMovie = movieListIterator.getprevNode();
+					} else if (title.compareTo(item.getTitle()) > 0) {
+						break;
 					}
 				}
 
-				if (!sameMovieInList) {
+				if(!sameMovieInList) {
 					Node<String> newNode = new Node<>(item.getTitle());
 					prevMovie.setNext(newNode);
-					movieList.numItems += 1;
+					newNode.setNext(currMovie);
+					genre.movielist.numItems += 1;
 				}
 
-			} else if (currGenre.getItem().compareTo(item.getGenre()) > 0) {
-				currGenre = (Genre) genreIterator.getprevNode();
+				break;
+
+			} else if (genre.getItem().compareTo(item.getGenre()) > 0) {
 				break;
 			}
 		}
+		
+		//todo 글자순서에 맞게 데이터 삽입하도록 구현
 
 		if(!canFindCorrectGenre) {
 			Genre newGenre = new Genre(item.getGenre());
-			currGenre.setNext(newGenre);
-			newGenre.movielist.add(item.getTitle());
+			Node<Genre> newNode = new Node<>(newGenre);
+			newNode.getItem().movielist.add(item.getTitle());
+			movieDBList.numItems += 1;
+
+			if (prevGenre == null) {
+				movieDBList.head.setNext(newNode);
+				return;
+			} else if (currGenre == null) {
+				movieDBList.add(newGenre);
+				movieDBList.numItems += 1;
+			}
+			movieDBList.numItems += 1;
+			prevGenre.setNext(newNode);
+			newNode.setNext(currGenre);
 		}
     }
 
     public void delete(MovieDBItem item) {
 
-        MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
-		Genre currGenre = (Genre) movieDBList.head;
+		Node<Genre> prevGenre = null;
+		Node<Genre> currGenre = movieDBList.head;
 
-		while(genreIterator.hasNext()) {
-			if (genreIterator.next() == item.getGenre()) {
-				currGenre = (Genre) genreIterator.getCurrNode();
-				MovieList movieList = currGenre.movielist;
-				MovieListIterator movieListIterator = (MovieListIterator) movieList.iterator();
-				Node<String> prevMovie = movieList.head;
+		for (Genre genre : movieDBList) {
+			prevGenre = currGenre;
+			currGenre = currGenre.getNext();
+			if (genre.getItem() == item.getGenre()) {
+				Node<String> prevMovie = null;
+				Node<String> currNode = genre.movielist.head;
 
-				while(movieListIterator.hasNext()) {
-					if (movieListIterator.next() == item.getTitle()) {
+				for (String title : genre.movielist) {
+					prevMovie = currNode;
+					currNode = currNode.getNext();
+					if (title == item.getTitle()) {
 						prevMovie.removeNext();
-						movieList.numItems -= 1;
+						genre.movielist.numItems -= 1;
 						break;
 					}
 				}
 
-				break;
+				if (genre.movielist.numItems == 0) {
+					prevGenre.setNext(currGenre.getNext());
+				}
 			}
+
+			break;
 		}
     }
 
     public MyLinkedList<MovieDBItem> search(String term) {
 
-        MyLinkedList<MovieDBItem> results = new MyLinkedList<MovieDBItem>();
-    	MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
-		Genre currGenre = (Genre) movieDBList.head;
-		MovieListIterator movieListIterator;
-		String movieTitle;
-		
-    	while(genreIterator.hasNext()) {
-			currGenre = (Genre) genreIterator.getCurrNode();
-			movieListIterator = (MovieListIterator) currGenre.movielist.iterator();
+		MyLinkedList<MovieDBItem> results = new MyLinkedList<MovieDBItem>();
 
-			while(movieListIterator.hasNext()) {
-				movieTitle = movieListIterator.next();
-				if(movieTitle.contains(term)) {
-					results.add(new MovieDBItem(currGenre.getItem(), movieTitle));
+		for (Genre genre : movieDBList) {
+			for (String title : genre.movielist) {
+				if (title.contains(term)) {
+					results.add(new MovieDBItem(genre.getItem(), title));
 				}
 			}
 		}
@@ -114,20 +124,14 @@ public class MovieDB {
     public MyLinkedList<MovieDBItem> items() {
 
         MyLinkedList<MovieDBItem> results = new MyLinkedList<MovieDBItem>();
-    	MyLinkedListIterator<String> genreIterator = (MyLinkedListIterator<String>) movieDBList.iterator();
-		Genre currGenre = (Genre) movieDBList.head;
-		MovieListIterator movieListIterator;
-		
-    	while(genreIterator.hasNext()) {
-			currGenre = (Genre) genreIterator.getCurrNode();
-			movieListIterator = (MovieListIterator) currGenre.movielist.iterator();
 
-			while(movieListIterator.hasNext()) {
-				results.add(new MovieDBItem(currGenre.getItem(), movieListIterator.next()));
+		for (Genre genre : movieDBList) {
+			for (String title : genre.movielist) {
+				results.add(new MovieDBItem(genre.getItem(), title));
 			}
 		}
-        
-    	return results;
+
+        return results;
     }
 }
 
