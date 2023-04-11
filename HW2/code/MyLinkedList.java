@@ -87,14 +87,6 @@ class MyLinkedListIterator<T> implements Iterator<T> {
 		return curr.getItem();
 	}
 
-	public Node<T> getprevNode() {
-		return prev;
-	}
-
-	public Node<T> getCurrNode() {
-		return curr;
-	}
-
 	@Override
 	public void remove() {
 		if (prev == null)
@@ -133,14 +125,6 @@ class MovieListIterator implements Iterator<String> {
 		curr = curr.getNext();
 
 		return curr.getItem();
-	}
-
-	public Node<String> getprevNode() {
-		return prev;
-	}
-
-	public Node<String> getCurrNode() {
-		return curr;
 	}
 
 	@Override
