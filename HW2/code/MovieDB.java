@@ -16,63 +16,59 @@ public class MovieDB {
 
     public void insert(MovieDBItem item) {
         // Insert the given item to the MovieDB.
-		Boolean canFindCorrectGenre = false;
 		Node<Genre> prevGenre = null;
 		Node<Genre> currGenre = movieDBList.head;
 
 		for (Genre genre : movieDBList) {
 			prevGenre = currGenre;
 			currGenre = currGenre.getNext();
-			if(genre.getItem() == item.getGenre()) {
-				Boolean sameMovieInList = false;
+			if(genre.getItem().equals(item.getGenre())) {
 				Node<String> prevMovie = null;
 				Node<String> currMovie = genre.movielist.head;
-				canFindCorrectGenre = true;
 
 				for (String title : genre.movielist) {
 					prevMovie = currMovie;
 					currMovie = currMovie.getNext();
-					if(title == item.getTitle()) {
-						sameMovieInList = true;
-						break;
+					if(title.equals(item.getTitle())) { // same movie is in list
+						return;
 					} else if (title.compareTo(item.getTitle()) > 0) {
-						break;
+						Node<String> newNode = new Node<String>(item.getTitle());
+						prevMovie.setNext(newNode);
+						newNode.setNext(currMovie);
+						genre.movielist.numItems += 1;
+
+						return;
 					}
 				}
 
-				if(!sameMovieInList) {
-					Node<String> newNode = new Node<>(item.getTitle());
-					prevMovie.setNext(newNode);
-					newNode.setNext(currMovie);
-					genre.movielist.numItems += 1;
-				}
-
-				break;
+				Node<String> newNode = new Node<>(item.getTitle());
+				currMovie.setNext(newNode);
+				newNode.setNext(null);
+				genre.movielist.numItems += 1;
+				
+				return;
 
 			} else if (genre.getItem().compareTo(item.getGenre()) > 0) {
-				break;
-			}
-		}
-		
-		//todo 글자순서에 맞게 데이터 삽입하도록 구현
-
-		if(!canFindCorrectGenre) {
-			Genre newGenre = new Genre(item.getGenre());
-			Node<Genre> newNode = new Node<>(newGenre);
-			newNode.getItem().movielist.add(item.getTitle());
-			movieDBList.numItems += 1;
-
-			if (prevGenre == null) {
-				movieDBList.head.setNext(newNode);
-				return;
-			} else if (currGenre == null) {
-				movieDBList.add(newGenre);
+				Genre newGenre = new Genre(item.getGenre());
+				Node<Genre> newNode = new Node<>(newGenre);
+				newNode.getItem().movielist.add(item.getTitle());
 				movieDBList.numItems += 1;
+				prevGenre.setNext(newNode);
+				newNode.setNext(currGenre);
+
+				return;
 			}
-			movieDBList.numItems += 1;
-			prevGenre.setNext(newNode);
-			newNode.setNext(currGenre);
 		}
+
+		Genre newGenre = new Genre(item.getGenre());
+		Node<Genre> newNode = new Node<>(newGenre);
+		newNode.getItem().movielist.add(item.getTitle());
+		movieDBList.numItems += 1;
+		currGenre.setNext(newNode);
+		newNode.setNext(null);
+
+		return;
+
     }
 
     public void delete(MovieDBItem item) {
@@ -83,26 +79,25 @@ public class MovieDB {
 		for (Genre genre : movieDBList) {
 			prevGenre = currGenre;
 			currGenre = currGenre.getNext();
-			if (genre.getItem() == item.getGenre()) {
+			if (genre.getItem().equals(item.getGenre())) {
 				Node<String> prevMovie = null;
 				Node<String> currNode = genre.movielist.head;
 
 				for (String title : genre.movielist) {
 					prevMovie = currNode;
 					currNode = currNode.getNext();
-					if (title == item.getTitle()) {
+					if (title.equals(item.getTitle())) {
 						prevMovie.removeNext();
 						genre.movielist.numItems -= 1;
-						break;
+						if (genre.movielist.numItems == 0) {
+							prevGenre.removeNext();
+							movieDBList.numItems -= 1;
+						}
+						return;
 					}
 				}
-
-				if (genre.movielist.numItems == 0) {
-					prevGenre.setNext(currGenre.getNext());
-				}
 			}
-
-			break;
+			return;
 		}
     }
 

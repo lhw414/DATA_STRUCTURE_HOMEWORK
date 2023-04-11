@@ -40,7 +40,6 @@ public class Node<T> {
     public final void removeNext() {
       Node<T> newNextNode = this.next.next;
       
-      newNextNode.next = null;
       this.next = newNextNode;
     }
 }
