@@ -96,8 +96,8 @@ public class MovieDB {
 						return;
 					}
 				}
+
 			}
-			return;
 		}
     }
 
