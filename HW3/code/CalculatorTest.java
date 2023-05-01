@@ -55,6 +55,7 @@ public class CalculatorTest
         }
     }
 
+	// ! REF : GPT - implement infix to postfix method using chat gpt except error checking
     // Method to convert infix expression to postfix
     private static String infixToPostfix(String infix) {
         Stack<Character> stack = new Stack<>();
@@ -117,7 +118,9 @@ public class CalculatorTest
 
         return postfix.toString();
     }
+	// ! ~ REF : GPT - implement infix to postfix method using chat gpt except error checking
 
+	// ! REF : GPT - implement evaluate postfix expression method using chat gpt except unary evaluate
 	private static long evaluatePostfix(String postfix) {
         Stack<Long> stack = new Stack<>();
 
@@ -169,5 +172,6 @@ public class CalculatorTest
 
         return stack.pop();
     }
+	// ! ~ REF : GPT - implement evaluate postfix expression method using chat gpt except unary evaluate
 
 }
