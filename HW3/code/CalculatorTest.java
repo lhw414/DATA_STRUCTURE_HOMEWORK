@@ -19,7 +19,7 @@ public class CalculatorTest
 			}
 			catch (Exception e)
 			{
-				System.out.println("입력이 잘못되었습니다. 오류 : " + e.toString());
+				System.out.println("ERROR");
 			}
 		}
 	}
@@ -27,8 +27,8 @@ public class CalculatorTest
 	private static void command(String input)
 	{
 		String postfixExpression = infixToPostfix(input);
-		System.out.println(postfixExpression);
 		long sum = evaluatePostfix(postfixExpression);
+		System.out.println(postfixExpression);
 		System.out.println(sum);
 	}
 
