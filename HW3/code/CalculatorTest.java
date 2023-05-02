@@ -170,7 +170,7 @@ public class CalculatorTest {
         }
         previousIsOperator = true;
         stack.push(c);
-      } else if (c != ' ' && c != '\t') {
+      } else if (c != ' ' && c != '\t') { // If the character is not in the supported symbol set, throw error
         throw new ArithmeticException();
       }
     }
