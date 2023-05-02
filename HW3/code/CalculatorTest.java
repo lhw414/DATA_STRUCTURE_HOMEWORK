@@ -66,9 +66,8 @@ public class CalculatorTest {
     Stack<Character> stack = new Stack<>();
     Stack<Integer> countAvgNum = new Stack<>();
     StringBuilder postfix = new StringBuilder();
+    Stack<Boolean> avgModeStack = new Stack<>();
     boolean previousIsOperator = true;
-    boolean prevAvgMode = false;
-    boolean avgMode = false;
     int parenthesisDepth = 0;
 
     for (int i = 0; i < infix.length(); i++) {
@@ -91,8 +90,7 @@ public class CalculatorTest {
       // If the character is an opening parenthesis, push it onto the stack
       else if (c == '(') {
         stack.push(c);
-        prevAvgMode = avgMode;
-        avgMode = false;
+        avgModeStack.push(false);
         previousIsOperator = true;
         parenthesisDepth += 1;
       }
@@ -103,7 +101,7 @@ public class CalculatorTest {
           throw new ArithmeticException();
         }
         // When avgMode
-        if (avgMode) {
+        if (avgModeStack.peek()) {
           while (!stack.isEmpty() && stack.peek() != '(') {
             postfix.append(stack.pop()).append(' ');
           }
@@ -117,7 +115,7 @@ public class CalculatorTest {
             .append(' ')
             .append("avg")
             .append(' ');
-          avgMode = prevAvgMode;
+          avgModeStack.pop();
           parenthesisDepth -= 1;
           continue;
         }
@@ -129,19 +127,20 @@ public class CalculatorTest {
           throw new ArithmeticException();
         } else {
           parenthesisDepth -= 1;
-          avgMode = prevAvgMode;
+          avgModeStack.pop();
           stack.pop(); // Remove the opening parenthesis from the stack
         }
       }
       // If the operator is avg(','), count the number of expression and pop previous expression's operators
       else if (c == ',') {
-        if (!avgMode) {
+        if (!avgModeStack.peek()) {
           countAvgNum.push(1);
         }
         if (parenthesisDepth <= 0) {
           throw new ArithmeticException();
         }
-        avgMode = true;
+        avgModeStack.pop();
+        avgModeStack.push(true);
         if (previousIsOperator) {
           throw new ArithmeticException();
         }
