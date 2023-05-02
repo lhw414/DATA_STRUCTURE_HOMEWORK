@@ -29,7 +29,7 @@ public class CalculatorTest {
     System.out.println(sum);
   }
 
-  // Method :
+  // Method : check character is operator
   private static boolean isOperator(char c) {
     return (
       c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^'
@@ -155,7 +155,7 @@ public class CalculatorTest {
       // If the character is an operator, pop operators from the stack and add them to the postfix expression until an operator with lower precedence is reached, then push the current operator onto the stack (implemented by GPT except unary - and ^ operation)
       else if (isOperator(c)) {
         if (c == '-') {
-          if (i == 0 || previousIsOperator) {
+          if (i == 0 || previousIsOperator) { // Check unary -
             stack.push('~');
             continue;
           }
@@ -163,7 +163,7 @@ public class CalculatorTest {
         while (
           !stack.isEmpty() && getPrecedence(c) <= getPrecedence(stack.peek())
         ) {
-          if (c == '^' && stack.peek() == '^') {
+          if (c == '^' && stack.peek() == '^') { // If ^ is consecutive, break.
             break;
           }
           postfix.append(stack.pop()).append(' ');
@@ -246,19 +246,19 @@ public class CalculatorTest {
             stack.push(operand1 * operand2);
             break;
           case '/':
-            if (operand2 == 0) {
+            if (operand2 == 0) { // When operand2 is 0, occuring error
               throw new ArithmeticException();
             }
             stack.push(operand1 / operand2);
             break;
           case '%':
-            if (operand2 == 0) {
+            if (operand2 == 0) {// When operand2 is 0, occuring error
               throw new ArithmeticException();
             }
             stack.push(operand1 % operand2);
             break;
           case '^':
-            if (operand2 < 0) {
+            if (operand2 < 0) { // When operand2 is less than 0, occuring error
               throw new ArithmeticException();
             }
             stack.push((long) Math.pow(operand1, operand2));
