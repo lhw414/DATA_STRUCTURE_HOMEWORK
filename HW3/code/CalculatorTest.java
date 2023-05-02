@@ -13,9 +13,7 @@ public class CalculatorTest {
         if (input.compareTo("q") == 0) break;
 
         command(input);
-      } catch (
-        Exception e
-      ) { // when error occured, print "ERROR"
+      } catch (Exception e) { // when error occured, print "ERROR"
         System.out.println("ERROR");
       }
     }
@@ -98,7 +96,8 @@ public class CalculatorTest {
         previousIsOperator = true;
         parenthesisDepth += 1;
       }
-      // If the character is a closing parenthesis, pop operators from the stack and add them to the postfix expression until an opening parenthesis is reached (implemented by GPT except avgMode)
+      // If the character is a closing parenthesis, pop operators from the stack and add them to the postfix expression
+      // until an opening parenthesis is reached (implemented by GPT except avgMode)
       else if (c == ')') {
         if (previousIsOperator) {
           throw new ArithmeticException();
@@ -152,7 +151,8 @@ public class CalculatorTest {
         previousIsOperator = true;
         countAvgNum.push(countAvgNum.pop() + 1);
       }
-      // If the character is an operator, pop operators from the stack and add them to the postfix expression until an operator with lower precedence is reached, then push the current operator onto the stack (implemented by GPT except unary - and ^ operation)
+      // If the character is an operator, pop operators from the stack and add them to the postfix expression
+      //until an operator with lower precedence is reached, then push the current operator onto the stack (implemented by GPT except unary - and ^ operation)
       else if (isOperator(c)) {
         if (c == '-') {
           if (i == 0 || previousIsOperator) { // Check unary -
@@ -230,7 +230,8 @@ public class CalculatorTest {
 
         stack.push(sum / numItems);
       }
-      // If the character is an operator, pop the top two elements from the stack, apply the operator and push the result back to the stack (implemented by GPT except error exception)
+      // If the character is an operator, pop the top two elements from the stack,
+      // apply the operator and push the result back to the stack (implemented by GPT except error exception)
       else if (isOperator(c)) {
         long operand2 = stack.pop();
         long operand1 = stack.pop();
@@ -252,7 +253,7 @@ public class CalculatorTest {
             stack.push(operand1 / operand2);
             break;
           case '%':
-            if (operand2 == 0) {// When operand2 is 0, occuring error
+            if (operand2 == 0) { // When operand2 is 0, occuring error
               throw new ArithmeticException();
             }
             stack.push(operand1 % operand2);
