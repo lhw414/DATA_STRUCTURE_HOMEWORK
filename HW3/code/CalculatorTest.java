@@ -66,9 +66,9 @@ public class CalculatorTest {
     Stack<Character> stack = new Stack<>();
     Stack<Integer> countAvgNum = new Stack<>();
     StringBuilder postfix = new StringBuilder();
-    Stack<Boolean> avgModeStack = new Stack<>();
-    boolean previousIsOperator = true;
-    int parenthesisDepth = 0;
+    Stack<Boolean> avgModeStack = new Stack<>(); // Check current parenthesis is avg mode or calc mode
+    boolean previousIsOperator = true; // Check previous is operator
+    int parenthesisDepth = 0; // Check current parenthesis depth
 
     for (int i = 0; i < infix.length(); i++) {
       char c = infix.charAt(i);
@@ -148,7 +148,7 @@ public class CalculatorTest {
           postfix.append(stack.pop()).append(' ');
         }
         previousIsOperator = true;
-        countAvgNum.push(countAvgNum.pop() + 1);
+        countAvgNum.push(countAvgNum.pop() + 1); // Increment avg operands number
       }
       // If the character is an operator, pop operators from the stack and add them to the postfix expression
       //until an operator with lower precedence is reached, then push the current operator onto the stack (implemented by GPT except unary - and ^ operation)
