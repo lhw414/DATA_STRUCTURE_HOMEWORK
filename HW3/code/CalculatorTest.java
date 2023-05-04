@@ -62,7 +62,7 @@ public class CalculatorTest {
    * @param    infix       an infix expression in string
    * @return   postfix     a postfix expression in string
    */
-  private static String infixToPostfix(String infix) {
+  private static String infixToPostfix(String infix) throws ArithmeticException {
     Stack<Character> stack = new Stack<>();
     Stack<Integer> countAvgNum = new Stack<>();
     StringBuilder postfix = new StringBuilder();
@@ -198,7 +198,7 @@ public class CalculatorTest {
    * @param    postfix                             an postfix expression in string
    * @return   stack.pop() (=evaluate value)       a evaluate value in long type
    */
-  private static long evaluatePostfix(String postfix) {
+  private static long evaluatePostfix(String postfix) throws ArithmeticException {
     Stack<Long> stack = new Stack<>();
 
     for (int i = 0; i < postfix.length(); i++) {
