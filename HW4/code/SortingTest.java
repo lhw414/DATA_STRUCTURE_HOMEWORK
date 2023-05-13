@@ -207,68 +207,99 @@ public class SortingTest {
 
 
         private static int[] DoRadixSort(int[] arr) {
-            if (arr.length <= 1) {
-                return arr;
-            }
-    
-            // Find the maximum and minimum numbers in one pass
-            int max = arr[0], min = arr[0];
-            for (int num : arr) {
-                if (num > max) {
-                    max = num;
-                } else if (num < min) {
-                    min = num;
-                }
-            }
-    
-            // Offset for handling negative numbers
-            int offset = -min;
-    
-            // Adding the offset to all the numbers in the array
-            for (int i = 0; i < arr.length; i++) {
-                arr[i] += offset;
-            }
-    
-            // Find the maximum number to know the number of digits
-            int maxDigits = Integer.toString(max + offset).length();
-    
-            // Perform counting sort for every digit
-            for (int exp = 1; maxDigits > 0; exp *= 10, maxDigits--) {
-                countingSort(arr, exp);
-            }
-    
-            // Subtract the offset from all the numbers in the array
-            for (int i = 0; i < arr.length; i++) {
-                arr[i] -= offset;
-            }
-    
-            return arr;
-        }
-    
-        private static void countingSort(int[] arr, int exp) {
-            int n = arr.length;
-            int[] output = new int[n];
-            int[] count = new int[10];
-    
-            // Store count of occurrences in count[]
-            for (int num : arr) {
-                count[(num / exp) % 10]++;
-            }
-    
-            // Change count[i] so that count[i] now contains actual position of this digit in output[]
-            for (int i = 1; i < 10; i++) {
-                count[i] += count[i - 1];
-            }
-    
-            // Build the output array
-            for (int i = n - 1; i >= 0; i--) {
-                output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-                count[(arr[i] / exp) % 10]--;
-            }
-    
-            // Copy the output array to arr[], so that arr[] now contains sorted numbers according to current digit
-            System.arraycopy(output, 0, arr, 0, n);
-        }
+			int[] sortedArr = Arrays.copyOf(arr, arr.length);
+	
+			int[] negArr = new int[sortedArr.length];
+			int[] posArr = new int[sortedArr.length];
+	
+			int negIndex = 0;
+			int posIndex = 0;
+	
+			for (int num : sortedArr) {
+				if (num < 0) {
+					negArr[negIndex++] = num;
+				} else {
+					posArr[posIndex++] = num;
+				}
+			}
+	
+			int offset = 0;
+			if (negIndex > 0) {
+				offset = -1 * (getMin(negArr, negIndex) - 1);
+				for (int i = 0; i < negIndex; i++) {
+					negArr[i] += offset;
+				}
+	
+				radixSortPositive(negArr, negIndex);
+			}
+	
+			if (posIndex > 0) {
+				radixSortPositive(posArr, posIndex);
+			}
+	
+			for (int i = 0; i < negIndex; i++) {
+				negArr[i] -= offset;
+				sortedArr[i] = negArr[i];
+			}
+	
+			for (int i = 0; i < posIndex; i++) {
+				sortedArr[i + negIndex] = posArr[i];
+			}
+	
+			return sortedArr;
+		}
+
+		private static void radixSortPositive(int[] arr, int size) {
+			int max = getMax(arr, size);
+	
+			for (int exp = 1; max / exp > 0; exp *= 10) {
+				countingSort(arr, size, exp);
+			}
+		}
+	
+		private static void countingSort(int[] arr, int size, int exp) {
+			int[] output = new int[size];
+			int[] count = new int[10];
+	
+			for (int i = 0; i < size; i++) {
+				count[(arr[i] / exp) % 10]++;
+			}
+	
+			for (int i = 1; i < 10; i++) {
+				count[i] += count[i - 1];
+			}
+	
+			for (int i = size - 1; i >= 0; i--) {
+				output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+				count[(arr[i] / exp) % 10]--;
+			}
+	
+			System.arraycopy(output, 0, arr, 0, size);
+		}
+	
+		private static int getMax(int[] arr, int size) {
+			int max = arr[0];
+	
+			for (int i = 1; i < size; i++) {
+				if (arr[i] > max) {
+					max = arr[i];
+				}
+			}
+	
+			return max;
+		}
+	
+		private static int getMin(int[] arr, int size) {
+			int min = arr[0];
+	
+			for (int i = 1; i < size; i++) {
+				if (arr[i] < min) {
+					min = arr[i];
+				}
+			}
+	
+			return min;
+		}
     
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
