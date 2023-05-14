@@ -36,6 +36,7 @@ public class SortingTest {
             // 숫자 입력을 다 받았으므로 정렬 방법을 받아 그에 맞는 정렬을 수행한다.
             while (true) {
                 int[] newvalue = (int[]) value.clone(); // 원래 값의 보호를 위해 복사본을 생성한다.
+                newvalue = DoMergeSort(newvalue); // for test
                 char algo = ' ';
 
                 if (args.length == 4) {
@@ -376,8 +377,28 @@ public class SortingTest {
 
             double collisionRate = (double) collisions / value.length;
 
-            System.out.println(collisionRate);
+            // if(collisionRate > 0.354) {
+            //     return 'M';
+            // }
 
+            double sortedRate;
+
+            if (value == null || value.length < 2) {
+                sortedRate = 1.0;
+            } else {
+
+                int sortedPairsCount = 0;
+
+                for (int i = 0; i < value.length - 1; i++) {
+                    if (value[i] <= value[i + 1]) {
+                        sortedPairsCount++;
+                    }
+                }
+
+                sortedRate = (double) sortedPairsCount / (value.length - 1);
+            }
+
+            System.out.println(sortedRate);
             return 'Q';
         }
     
