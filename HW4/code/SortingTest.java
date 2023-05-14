@@ -100,7 +100,6 @@ public class SortingTest {
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static int[] DoBubbleSort(int[] value) {
             int temp;
-            boolean swapped = true;
 
             for (int i = 0; i < value.length - 1; i++) {
                 for (int j = 0; j < value.length - i - 1; j++) {
@@ -108,11 +107,7 @@ public class SortingTest {
                         temp = value[j];
                         value[j] = value[j + 1];
                         value[j + 1] = temp;
-                        swapped = true;
                     }
-                }
-                if (!swapped) {
-                    break;
                 }
             }
             return value;
@@ -135,57 +130,44 @@ public class SortingTest {
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static int[] DoHeapSort(int[] value) {
-            BuildHeap(value);
+            buildMaxHeap(value);
             int n = value.length;
-            for (int i = n-1; i >= 1; i--) {
-                value[i] = deleteMax(value, i+1);
+            for (int i = n - 1; i >= 1; i--) {
+                int temp = value[0];
+                value[0] = value[i];
+                value[i] = temp;
+                percolateDown(value, 0, i);
             }
 
             return value;
         }
-
-        private static void BuildHeap(int[] value) {
-            int n = value.length;
-            for (int i = (n-2)/2; i >= 0; i--){
-                percolateDownBuildHeap(value, i);
+    
+        private static void buildMaxHeap(int[] array) {
+            int n = array.length;
+            for (int i = (n - 2) / 2; i >= 0; i--) {
+                percolateDown(array, i, n);
             }
         }
-
-        private static void percolateDownBuildHeap(int[] value, int k){
-            int n = value.length;
-            int child = 2*k + 1, right = 2*k + 2;
-            if (child <= n-1){
-                if (right <= n-1 && value[child] < value[right]){
-                    child = right;
-                }
-                if (value[k] < value[child]){
-                    int temp = value[child];
-                    value[child] = value[k];
-                    value[k] = temp;
-                    percolateDownBuildHeap(value, child);
-                }
+    
+        private static void percolateDown(int[] array, int k, int n) {
+            int leftChild = 2 * k + 1;
+            int rightChild = 2 * k + 2;
+    
+            if (leftChild >= n) {
+                return;
             }
-        }
-
-        private static int deleteMax(int[] A, int n){
-            int max = A[0];
-            A[0] = A[n-1];
-            percolateDownHeapSort(A, 0, n);
-            return max;
-        }
-
-        private static void percolateDownHeapSort(int[] A, int k, int n){
-            int child = 2*k + 1, right = 2*k + 2;
-            if (child <= n-1){
-                if (right <= n-1 && A[child] < A[right]){
-                    child = right;
-                }
-                if (A[k] < A[child]){
-                    int temp = A[child];
-                    A[child] = A[k];
-                    A[k] = temp;
-                    percolateDownHeapSort(A, child, n);
-                }
+    
+            int maxChild = leftChild;
+    
+            if (rightChild < n && array[leftChild] < array[rightChild]) {
+                maxChild = rightChild;
+            }
+    
+            if (array[k] < array[maxChild]) {
+                int temp = array[k];
+                array[k] = array[maxChild];
+                array[maxChild] = temp;
+                percolateDown(array, maxChild, n);
             }
         }
     
@@ -376,10 +358,11 @@ public class SortingTest {
             }
 
             double collisionRate = (double) collisions / value.length;
-
-            // if(collisionRate > 0.354) {
-            //     return 'M';
-            // }
+            System.out.println(collisionRate);
+            if(collisionRate > 0.354) {
+                DoMergeSort(value);
+                return 'M';
+            }
 
             double sortedRate;
 
@@ -398,7 +381,13 @@ public class SortingTest {
                 sortedRate = (double) sortedPairsCount / (value.length - 1);
             }
 
-            System.out.println(sortedRate);
+            if (sortedRate > 0.998) {
+                DoInsertionSort(value);
+                return 'I';
+            }
+
+
+            DoQuickSort(value);
             return 'Q';
         }
     
