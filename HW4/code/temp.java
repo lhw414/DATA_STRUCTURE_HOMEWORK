@@ -189,39 +189,36 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoMergeSort(int[] value){
-            int[] switchingValue = new int[value.length];
-            for (int i = 0; i < value.length; i++){
-                switchingValue[i] = value[i];
+        private static int[] DoMergeSort(int[] value) {
+            // Merge Sort 구현
+            if (value.length <= 1) {
+                return value;
             }
-            switchingMergeSort(0, value.length-1, value, switchingValue);
-            return (value);
+            int mid = value.length / 2;
+            int[] left = Arrays.copyOfRange(value, 0, mid);
+            int[] right = Arrays.copyOfRange(value, mid, value.length);
+            left = DoMergeSort(left);
+            right = DoMergeSort(right);
+            return merge(left, right);
         }
     
-        private static void switchingMergeSort(int p, int r, int[] value, int[] switchingValue){
-            if (p < r){
-                int q = (p+r)/2;
-                switchingMergeSort(p, q, switchingValue, value);
-                switchingMergeSort(q+1, r, switchingValue, value);
-                switchingMerge(p, q, r, switchingValue, value);
-            }
-        }
-    
-        private static void switchingMerge(int p, int q, int r, int[] arr1, int[] arr2){
-            int i = p, j = q+1, t = p;
-            while (i <= q && j <= r){
-                if (arr1[i] <= arr1[j]){
-                    arr2[t++] = arr1[i++];
-                } else{
-                    arr2[t++] = arr1[j++];
+        private static int[] merge(int[] left, int[] right) {
+            int[] result = new int[left.length + right.length];
+            int i = 0, j = 0, k = 0;
+            while (i < left.length && j < right.length) {
+                if (left[i] <= right[j]) {
+                    result[k++] = left[i++];
+                } else {
+                    result[k++] = right[j++];
                 }
             }
-            while (i <= q){
-                arr2[t++] = arr1[i++];
+            while (i < left.length) {
+                result[k++] = left[i++];
             }
-            while (j <= r){
-                arr2[t++] = arr1[j++];
+            while (j < right.length) {
+                result[k++] = right[j++];
             }
+            return result;
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
