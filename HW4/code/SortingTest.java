@@ -36,7 +36,6 @@ public class SortingTest {
             // 숫자 입력을 다 받았으므로 정렬 방법을 받아 그에 맞는 정렬을 수행한다.
             while (true) {
                 int[] newvalue = (int[]) value.clone(); // 원래 값의 보호를 위해 복사본을 생성한다.
-                newvalue = DoMergeSort(newvalue); // for test
                 char algo = ' ';
 
                 if (args.length == 4) {
@@ -96,7 +95,12 @@ public class SortingTest {
                 System.out.println("입력이 잘못되었습니다. 오류 : " + e.toString());
             }
         }
-    
+        
+        /**
+         * 
+         * 
+         * 
+         */
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static int[] DoBubbleSort(int[] value) {
             int temp;
