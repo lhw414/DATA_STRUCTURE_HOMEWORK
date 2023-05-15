@@ -212,35 +212,6 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        // private static int[] DoQuickSort(int[] value){
-        //     return quickSort(value, 0, value.length - 1);
-        // }
-
-        // private static int[] quickSort(int[] arr, int left, int right) {
-        //     if (left < right) {
-        //         int pivotIndex = partition(arr, left, right);
-        //         quickSort(arr, left, pivotIndex - 1);
-        //         quickSort(arr, pivotIndex + 1, right);
-        //     }
-        //     return arr;
-        // }
-
-        // private static int partition(int[] arr, int left, int right) {
-        //     int pivot = arr[right];
-        //     int i = left - 1;
-        //     for (int j = left; j < right; j++) {
-        //         if (arr[j] < pivot) {
-        //             i++;
-        //             int temp = arr[i];
-        //             arr[i] = arr[j];
-        //             arr[j] = temp;
-        //         }
-        //     }
-        //     int temp = arr[i + 1];
-        //     arr[i + 1] = arr[right];
-        //     arr[right] = temp;
-        //     return i + 1;
-        // }
 
         private static int[] DoQuickSort(int[] array) {
             quickSort(array, 0, array.length - 1);
@@ -288,29 +259,21 @@ public class SortingTest {
 
 
         private static int[] DoRadixSort(int[] arr) {
-			int[] sortedArr = Arrays.copyOf(arr, arr.length);
-	
-			int[] negArr = new int[sortedArr.length];
-			int[] posArr = new int[sortedArr.length];
+			int[] negArr = new int[arr.length];
+			int[] posArr = new int[arr.length];
 	
 			int negIndex = 0;
 			int posIndex = 0;
-	
-			for (int num : sortedArr) {
+            int offset = -1 * getMin(arr, arr.length);
+			for (int num : arr) {
 				if (num < 0) {
-					negArr[negIndex++] = num;
+					negArr[negIndex++] = num + offset;
 				} else {
 					posArr[posIndex++] = num;
 				}
 			}
 	
-			int offset = 0;
 			if (negIndex > 0) {
-				offset = -1 * (getMin(negArr, negIndex) - 1);
-				for (int i = 0; i < negIndex; i++) {
-					negArr[i] += offset;
-				}
-	
 				radixSortPositive(negArr, negIndex);
 			}
 	
@@ -319,15 +282,14 @@ public class SortingTest {
 			}
 	
 			for (int i = 0; i < negIndex; i++) {
-				negArr[i] -= offset;
-				sortedArr[i] = negArr[i];
+				arr[i] = negArr[i] - offset;
 			}
 	
 			for (int i = 0; i < posIndex; i++) {
-				sortedArr[i + negIndex] = posArr[i];
+				arr[i + negIndex] = posArr[i];
 			}
 	
-			return sortedArr;
+			return arr;
 		}
 
 		private static void radixSortPositive(int[] arr, int size) {
