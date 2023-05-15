@@ -347,27 +347,6 @@ public class SortingTest {
             int maxValue = getMax(value, value.length);
             int minValue = getMin(value, value.length);
 
-            int hashTableSize = maxValue - minValue;
-            int collisions = 0;
-            Hashtable<Integer, Integer> hashTable = new Hashtable<>(hashTableSize);
-
-            for (int num : value) {
-                int hash_num = num - minValue;
-                int hash = hash_num % hashTableSize;
-                if (hashTable.containsKey(hash)) {
-                    collisions++;
-                } else {
-                    hashTable.put(hash, hash_num);
-                }
-            }
-
-            double collisionRate = (double) collisions / value.length;
-            System.out.println(collisionRate);
-            if(collisionRate > 0.354) {
-                DoMergeSort(value);
-                return 'M';
-            }
-
             double sortedRate;
 
             if (value == null || value.length < 2) {
@@ -385,16 +364,42 @@ public class SortingTest {
                 sortedRate = (double) sortedPairsCount / (value.length - 1);
             }
 
-            if (sortedRate > 0.998) {
+            if (sortedRate == 1.0) {
                 DoInsertionSort(value);
                 return 'I';
             }
 
+            int hashTableSize = maxValue - minValue;
+            int collisions = 0;
+            Hashtable<Integer, Integer> hashTable = new Hashtable<>(hashTableSize);
+
+            for (int num : value) {
+                int hash_num = num - minValue;
+                int hash = hash_num % hashTableSize;
+                if (hashTable.containsKey(hash)) {
+                    collisions++;
+                } else {
+                    hashTable.put(hash, hash_num);
+                }
+            }
+
+            double collisionRate = (double) collisions / value.length;
+            System.out.println(collisionRate);
+            if(collisionRate > 0.99999) {
+                DoMergeSort(value);
+                return 'H';
+            }
+
+            int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
+            
+            if (digits <= 2 && digits <= 0.125 * (Math.log(value.length) / Math.log(2))) {
+                DoRadixSort(value);
+                return 'R';
+            }
 
             DoQuickSort(value);
-            return 'Q';
+            return 'M';
         }
-    
 
 }
 
