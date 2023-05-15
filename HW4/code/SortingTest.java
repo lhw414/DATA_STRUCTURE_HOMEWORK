@@ -212,34 +212,76 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoQuickSort(int[] value){
-            return quickSort(value, 0, value.length - 1);
-        }
+        // private static int[] DoQuickSort(int[] value){
+        //     return quickSort(value, 0, value.length - 1);
+        // }
 
-        private static int[] quickSort(int[] arr, int left, int right) {
-            if (left < right) {
-                int pivotIndex = partition(arr, left, right);
-                quickSort(arr, left, pivotIndex - 1);
-                quickSort(arr, pivotIndex + 1, right);
+        // private static int[] quickSort(int[] arr, int left, int right) {
+        //     if (left < right) {
+        //         int pivotIndex = partition(arr, left, right);
+        //         quickSort(arr, left, pivotIndex - 1);
+        //         quickSort(arr, pivotIndex + 1, right);
+        //     }
+        //     return arr;
+        // }
+
+        // private static int partition(int[] arr, int left, int right) {
+        //     int pivot = arr[right];
+        //     int i = left - 1;
+        //     for (int j = left; j < right; j++) {
+        //         if (arr[j] < pivot) {
+        //             i++;
+        //             int temp = arr[i];
+        //             arr[i] = arr[j];
+        //             arr[j] = temp;
+        //         }
+        //     }
+        //     int temp = arr[i + 1];
+        //     arr[i + 1] = arr[right];
+        //     arr[right] = temp;
+        //     return i + 1;
+        // }
+
+        private static int[] DoQuickSort(int[] array) {
+            quickSort(array, 0, array.length - 1);
+
+            return array;
+        }
+    
+        private static void quickSort(int[] array, int low, int high) {
+            if (low < high) {
+                int[] partitionIndices = partition(array, low, high);
+                int left = partitionIndices[0];
+                int right = partitionIndices[1];
+                quickSort(array, low, left - 1);
+                quickSort(array, right + 1, high);
             }
-            return arr;
         }
-
-        private static int partition(int[] arr, int left, int right) {
-            int pivot = arr[right];
-            int i = left - 1;
-            for (int j = left; j < right; j++) {
-                if (arr[j] < pivot) {
+    
+        private static int[] partition(int[] array, int low, int high) {
+            int pivot = array[low];
+            int left = low;
+            int i = low + 1;
+            int right = high;
+    
+            while (i <= right) {
+                if (array[i] < pivot) {
+                    int temp = array[i];
+                    array[i] = array[left];
+                    array[left] = temp;
+                    left++;
                     i++;
-                    int temp = arr[i];
-                    arr[i] = arr[j];
-                    arr[j] = temp;
+                } else if (array[i] > pivot) {
+                    int temp = array[i];
+                    array[i] = array[right];
+                    array[right] = temp;
+                    right--;
+                } else {
+                    i++;
                 }
             }
-            int temp = arr[i + 1];
-            arr[i + 1] = arr[right];
-            arr[right] = temp;
-            return i + 1;
+    
+            return new int[] { left, right };
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +408,7 @@ public class SortingTest {
 
             if (sortedRate == 1.0) {
                 DoInsertionSort(value);
+                System.out.println('I');
                 return 'I';
             }
 
@@ -384,20 +427,23 @@ public class SortingTest {
             }
 
             double collisionRate = (double) collisions / value.length;
-            System.out.println(collisionRate);
-            if(collisionRate > 0.99999) {
+            
+            if(collisionRate > 0.99801) {
                 DoMergeSort(value);
-                return 'H';
+                System.out.println('Q');
+                return 'Q';
             }
 
             int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
             
             if (digits <= 2 && digits <= 0.125 * (Math.log(value.length) / Math.log(2))) {
                 DoRadixSort(value);
+                System.out.println('R');
                 return 'R';
             }
 
             DoQuickSort(value);
+            System.out.println('M');
             return 'M';
         }
 
