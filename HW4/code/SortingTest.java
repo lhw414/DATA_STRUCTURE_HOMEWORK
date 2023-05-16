@@ -353,6 +353,7 @@ public class SortingTest {
             int maxValue = getMax(value, value.length);
             int minValue = getMin(value, value.length);
 
+            // sortedRate 계산
             double sortedRate;
 
             if (value == null || value.length < 2) {
@@ -369,13 +370,9 @@ public class SortingTest {
 
                 sortedRate = (double) sortedPairsCount / (value.length - 1);
             }
-            System.out.println(sortedRate);//for check
-            if (sortedRate == 1.0) {
-                DoInsertionSort(value);
-                System.out.println('I');
-                return 'I';
-            }
-
+            System.out.println(sortedRate);
+            
+            // collisionRate 계산
             int hashTableSize = maxValue - minValue;
             int collisions = 0;
             Hashtable<Integer, Integer> hashTable = new Hashtable<>(hashTableSize);
@@ -392,28 +389,28 @@ public class SortingTest {
 
             double collisionRate = (double) collisions / value.length;
             System.out.println(collisionRate);//for check
-            if(collisionRate > 0.99801) {
-                DoMergeSort(value);
+
+            if (sortedRate >= 1.0 - Math.ulp(1.0)) { // 만약 정렬되어 있는 배열이라면, Insertion sort 추천
+                DoInsertionSort(value);
+                System.out.println('I');
+                return 'I';
+            }
+
+            int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
+            System.out.println(0.25 * (Math.log(value.length) / Math.log(2))); //for check
+            if (digits <= 0.255 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.99801) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
+                DoRadixSort(value);
+                System.out.println('R');
+                return 'R';
+            } else if (collisionRate > 0.99801) { // collisionRate가 0.99801보다 크다면, quick sort 추천 
+                DoQuickSort(value);
                 System.out.println('Q');
                 return 'Q';
             }
 
-            int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
-            System.out.println(0.25 * (Math.log(value.length) / Math.log(2)));//for check
-            if (digits <= 0.25 * (Math.log(value.length) / Math.log(2))) {
-                DoRadixSort(value);
-                System.out.println('R');
-                return 'R';
-            }
-
-            if (value.length >= 1000000) {
-                DoQuickSort(value);
-                return 'Q';
-            }
-
-            DoMergeSort(value);
-            System.out.println('M');
-            return 'M';
+            DoQuickSort(value);
+            System.out.println('Q');
+            return 'Q';
         }
 
 }
