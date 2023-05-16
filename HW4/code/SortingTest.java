@@ -96,10 +96,12 @@ public class SortingTest {
             }
         }
         
-        /**
-         * 
-         * 
-         * 
+        /** Reference start ~
+         * ! REFERENCE : GPT - get sorting algorithms' skeleton code and implement simple sorting algorithms
+         * @reference content
+         *   - Get skeleton code from GPT.
+         *   - Implement simple sorting algorithms : DoBubbleSort, DoInsertionSort, Doheapsort
+         *                            
          */
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static int[] DoBubbleSort(int[] value) {
@@ -343,7 +345,7 @@ public class SortingTest {
 	
 			return min;
 		}
-    
+        // ! ~ Reference end : GPT - get sorting algorithms' skeleton code and implement simple sorting algorithms
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static char DoSearch(int[] value) {
@@ -367,7 +369,7 @@ public class SortingTest {
 
                 sortedRate = (double) sortedPairsCount / (value.length - 1);
             }
-
+            System.out.println(sortedRate);//for check
             if (sortedRate == 1.0) {
                 DoInsertionSort(value);
                 System.out.println('I');
@@ -389,7 +391,7 @@ public class SortingTest {
             }
 
             double collisionRate = (double) collisions / value.length;
-            
+            System.out.println(collisionRate);//for check
             if(collisionRate > 0.99801) {
                 DoMergeSort(value);
                 System.out.println('Q');
@@ -397,14 +399,19 @@ public class SortingTest {
             }
 
             int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
-            
-            if (digits <= 2 && digits <= 0.125 * (Math.log(value.length) / Math.log(2))) {
+            System.out.println(0.25 * (Math.log(value.length) / Math.log(2)));//for check
+            if (digits <= 0.25 * (Math.log(value.length) / Math.log(2))) {
                 DoRadixSort(value);
                 System.out.println('R');
                 return 'R';
             }
 
-            DoQuickSort(value);
+            if (value.length >= 1000000) {
+                DoQuickSort(value);
+                return 'Q';
+            }
+
+            DoMergeSort(value);
             System.out.println('M');
             return 'M';
         }
