@@ -318,7 +318,7 @@ public class SortingTest {
 				output[count[(arr[i] / exp) % 10] - 1] = arr[i];
 				count[(arr[i] / exp) % 10]--;
 			}
-	
+
 			System.arraycopy(output, 0, arr, 0, size);
 		}
 	
@@ -373,23 +373,20 @@ public class SortingTest {
             System.out.println(sortedRate);
             
             // collisionRate 계산
-            int hashTableSize = maxValue - minValue;
+            int hashMapSize = maxValue - minValue;
             int collisions = 0;
-            Hashtable<Integer, Integer> hashTable = new Hashtable<>(hashTableSize);
+            HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(hashMapSize);
 
             for (int num : value) {
-                int hash_num = num - minValue;
-                int hash = hash_num % hashTableSize;
-                if (hashTable.containsKey(hash)) {
+                if (hashMap.containsKey(num)) {
                     collisions++;
                 } else {
-                    hashTable.put(hash, hash_num);
+                 hashMap.put(num, num);
                 }
             }
 
             double collisionRate = (double) collisions / value.length;
             System.out.println(collisionRate);//for check
-
             if (sortedRate >= 1.0 - Math.ulp(1.0)) { // 만약 정렬되어 있는 배열이라면, Insertion sort 추천
                 DoInsertionSort(value);
                 System.out.println('I');
@@ -397,12 +394,12 @@ public class SortingTest {
             }
 
             int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
-            System.out.println(0.25 * (Math.log(value.length) / Math.log(2))); //for check
-            if (digits <= 0.255 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.99801) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
+            System.out.println(0.35 * (Math.log(value.length) / Math.log(2))); //for check
+            if (digits <= 0.35 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.98801) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
                 DoRadixSort(value);
                 System.out.println('R');
                 return 'R';
-            } else if (collisionRate > 0.99801) { // collisionRate가 0.99801보다 크다면, quick sort 추천 
+            } else if (collisionRate > 0.98801) { // collisionRate가 0.99801보다 크다면, quick sort 추천 
                 DoQuickSort(value);
                 System.out.println('Q');
                 return 'Q';
