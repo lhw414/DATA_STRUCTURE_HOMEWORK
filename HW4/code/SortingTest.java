@@ -148,14 +148,14 @@ public class SortingTest {
             return value;
         }
     
-        private static void buildMaxHeap(int[] array) {
+        private static void buildMaxHeap(int[] array) { // 임의의 배열에 maxheap build
             int n = array.length;
             for (int i = (n - 2) / 2; i >= 0; i--) {
                 percolateDown(array, i, n);
             }
         }
     
-        private static void percolateDown(int[] array, int k, int n) {
+        private static void percolateDown(int[] array, int k, int n) { // root node 제거시, max heap 수선
             int leftChild = 2 * k + 1;
             int rightChild = 2 * k + 2;
     
@@ -178,16 +178,16 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoMergeSort(int[] value){
+        private static int[] DoMergeSort(int[] value){ // 배열 할당으로 인한 수행 시간 증가를 줄이기 위해, switching merge sort 구현
             int[] switchingValue = new int[value.length];
             for (int i = 0; i < value.length; i++){
-                switchingValue[i] = value[i];
+                switchingValue[i] = value[i]; // 보조 배열(switching 배열)에 value값 복사
             }
             switchingMergeSort(0, value.length-1, value, switchingValue);
             return (value);
         }
     
-        private static void switchingMergeSort(int p, int r, int[] value, int[] switchingValue){
+        private static void switchingMergeSort(int p, int r, int[] value, int[] switchingValue){ // switching merge 및 mergesort 시 두 개의 배열을 교차하여 전달
             if (p < r){
                 int q = (p+r)/2;
                 switchingMergeSort(p, q, switchingValue, value);
@@ -221,7 +221,7 @@ public class SortingTest {
             return array;
         }
     
-        private static void quickSort(int[] array, int low, int high) {
+        private static void quickSort(int[] array, int low, int high) { // 3-way partition 구현
             if (low < high) {
                 int[] partitionIndices = partition(array, low, high);
                 int left = partitionIndices[0];
@@ -238,18 +238,18 @@ public class SortingTest {
             int right = high;
     
             while (i <= right) {
-                if (array[i] < pivot) {
+                if (array[i] < pivot) { // pivot보다 작을시, pivot의 왼쪽인 1구역
                     int temp = array[i];
                     array[i] = array[left];
                     array[left] = temp;
                     left++;
                     i++;
-                } else if (array[i] > pivot) {
+                } else if (array[i] > pivot) { //pivot 보다 클 시, pivot의 오른쪽인 2구역
                     int temp = array[i];
                     array[i] = array[right];
                     array[right] = temp;
                     right--;
-                } else {
+                } else { // pivot과 같을 시, pivot과 동일한 위치인 3구역
                     i++;
                 }
             }
@@ -269,26 +269,26 @@ public class SortingTest {
             int offset = -1 * getMin(arr, arr.length);
 			for (int num : arr) {
 				if (num < 0) {
-					negArr[negIndex++] = num + offset;
+					negArr[negIndex++] = num + offset; // counting sort를 위해 offset울 이용한 postive array 생성
 				} else {
 					posArr[posIndex++] = num;
 				}
 			}
 	
 			if (negIndex > 0) {
-				radixSortPositive(negArr, negIndex);
+				radixSortPositive(negArr, negIndex); // postive array
 			}
 	
 			if (posIndex > 0) {
-				radixSortPositive(posArr, posIndex);
+				radixSortPositive(posArr, posIndex); // negative array
 			}
 	
 			for (int i = 0; i < negIndex; i++) {
-				arr[i] = negArr[i] - offset;
+				arr[i] = negArr[i] - offset; // 원래의 값으로 복원 및 return array에 복사
 			}
 	
 			for (int i = 0; i < posIndex; i++) {
-				arr[i + negIndex] = posArr[i];
+				arr[i + negIndex] = posArr[i]; // return array에 이어붙임
 			}
 	
 			return arr;
@@ -302,7 +302,7 @@ public class SortingTest {
 			}
 		}
 	
-		private static void countingSort(int[] arr, int size, int exp) {
+		private static void countingSort(int[] arr, int size, int exp) { // 자릿수를 이용한 counting sort 진행
 			int[] output = new int[size];
 			int[] count = new int[10];
 	
@@ -370,7 +370,10 @@ public class SortingTest {
 
                 sortedRate = (double) sortedPairsCount / (value.length - 1);
             }
-            System.out.println(sortedRate);
+
+            if (sortedRate == 1.0) { // 만약 정렬되어 있는 배열이라면, Insertion sort 추천
+                return 'I';
+            }
             
             // collisionRate 계산
             int hashMapSize = maxValue - minValue;
@@ -386,27 +389,13 @@ public class SortingTest {
             }
 
             double collisionRate = (double) collisions / value.length;
-            System.out.println(collisionRate);//for check
-            if (sortedRate >= 1.0 - Math.ulp(1.0)) { // 만약 정렬되어 있는 배열이라면, Insertion sort 추천
-                DoInsertionSort(value);
-                System.out.println('I');
-                return 'I';
-            }
 
             int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
-            System.out.println(0.35 * (Math.log(value.length) / Math.log(2))); //for check
-            if (digits <= 0.35 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.98801) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
-                DoRadixSort(value);
-                System.out.println('R');
+            if (digits <= 0.241 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.9986) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
                 return 'R';
-            } else if (collisionRate > 0.98801) { // collisionRate가 0.99801보다 크다면, quick sort 추천 
-                DoQuickSort(value);
-                System.out.println('Q');
-                return 'Q';
             }
 
-            DoQuickSort(value);
-            System.out.println('Q');
+            // 그 외의 경우에는, quick sort 추천
             return 'Q';
         }
 
