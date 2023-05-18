@@ -155,7 +155,7 @@ public class SortingTest {
             }
         }
     
-        private static void percolateDown(int[] array, int k, int n) { // root node 제거시, max heap 수선
+        private static void percolateDown(int[] array, int k, int n) { // recursive하게 child node로 이동하여 max heap 수선
             int leftChild = 2 * k + 1;
             int rightChild = 2 * k + 2;
     
@@ -319,7 +319,10 @@ public class SortingTest {
 				count[(arr[i] / exp) % 10]--;
 			}
 
-			System.arraycopy(output, 0, arr, 0, size);
+            for (int i = 0; i < size; i++) {
+                arr[i] = output[i];
+            }
+
 		}
 	
 		private static int getMax(int[] arr, int size) {
