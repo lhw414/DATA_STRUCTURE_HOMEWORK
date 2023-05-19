@@ -349,7 +349,8 @@ public class SortingTest {
 			return min;
 		}
         // ! ~ Reference end : GPT - get sorting algorithms' skeleton code and implement simple sorting algorithms
-    
+        
+        // DoSearch : 배열의 특성을 O(n) 시간복잡도 안에 파악하여, 배열에 가장 효과적으로 작용할 정렬 알고리즘 리턴
         ////////////////////////////////////////////////////////////////////////////////////////////////
         private static char DoSearch(int[] value) {
 
