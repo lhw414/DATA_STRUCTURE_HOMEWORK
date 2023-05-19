@@ -99,17 +99,17 @@ public class SortingTest {
         /** Reference start ~
          * ! REFERENCE : GPT - get sorting algorithms' skeleton code and implement simple sorting algorithms
          * @reference content
-         *   - Get skeleton code from GPT.
+         *   - Get skeleton code and logic from GPT.
          *   - Implement simple sorting algorithms : DoBubbleSort, DoInsertionSort, Doheapsort
-         *                            
+         *   - Implement skeleton code for DoQuickSort, DoMergeSort, DoRadixSort                         
          */
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoBubbleSort(int[] value) {
+        private static int[] DoBubbleSort(int[] value) { // 버블 정렬 수행
             int temp;
 
             for (int i = 0; i < value.length - 1; i++) {
                 for (int j = 0; j < value.length - i - 1; j++) {
-                    if (value[j] > value[j + 1]) {
+                    if (value[j] > value[j + 1]) { // 앞 원소가 더 클 시, 값 교환
                         temp = value[j];
                         value[j] = value[j + 1];
                         value[j + 1] = temp;
@@ -120,12 +120,12 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoInsertionSort(int[] value) {
+        private static int[] DoInsertionSort(int[] value) { // 선택 정렬 수행
             // Insertion Sort 구현
             for (int i = 1; i < value.length; i++) {
                 int key = value[i];
                 int j = i - 1;
-                while (j >= 0 && value[j] > key) {
+                while (j >= 0 && value[j] > key) { // 배열이 정렬되도록 원소 삽입
                     value[j + 1] = value[j];
                     j--;
                 }
@@ -135,10 +135,10 @@ public class SortingTest {
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        private static int[] DoHeapSort(int[] value) {
+        private static int[] DoHeapSort(int[] value) { // 힙 정렬 수행
             buildMaxHeap(value);
             int n = value.length;
-            for (int i = n - 1; i >= 1; i--) {
+            for (int i = n - 1; i >= 1; i--) { // max 값 찾은 후, percolate down 실행
                 int temp = value[0];
                 value[0] = value[i];
                 value[i] = temp;
@@ -169,7 +169,7 @@ public class SortingTest {
                 maxChild = rightChild;
             }
     
-            if (array[k] < array[maxChild]) {
+            if (array[k] < array[maxChild]) { // child node가 더 클 시, 값 교환
                 int temp = array[k];
                 array[k] = array[maxChild];
                 array[maxChild] = temp;
@@ -198,24 +198,24 @@ public class SortingTest {
     
         private static void switchingMerge(int p, int q, int r, int[] arr1, int[] arr2){
             int i = p, j = q+1, t = p;
-            while (i <= q && j <= r){
+            while (i <= q && j <= r){ // 보조 배열에 정렬값 대입
                 if (arr1[i] <= arr1[j]){
                     arr2[t++] = arr1[i++];
                 } else{
                     arr2[t++] = arr1[j++];
                 }
             }
-            while (i <= q){
+            while (i <= q){ // 남은 값 복사
                 arr2[t++] = arr1[i++];
             }
-            while (j <= r){
+            while (j <= r){ // 남은 값 복사
                 arr2[t++] = arr1[j++];
             }
         }
     
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private static int[] DoQuickSort(int[] array) {
+        private static int[] DoQuickSort(int[] array) { // 퀵 정렬 수행
             quickSort(array, 0, array.length - 1);
 
             return array;
@@ -297,7 +297,7 @@ public class SortingTest {
 		private static void radixSortPositive(int[] arr, int size) {
 			int max = getMax(arr, size);
 	
-			for (int exp = 1; max / exp > 0; exp *= 10) {
+			for (int exp = 1; max / exp > 0; exp *= 10) { // 각 자리수에 대해 counting sort 수행
 				countingSort(arr, size, exp);
 			}
 		}
@@ -325,7 +325,7 @@ public class SortingTest {
 
 		}
 	
-		private static int getMax(int[] arr, int size) {
+		private static int getMax(int[] arr, int size) { // 배열의 최대값 리턴
 			int max = arr[0];
 	
 			for (int i = 1; i < size; i++) {
@@ -337,7 +337,7 @@ public class SortingTest {
 			return max;
 		}
 	
-		private static int getMin(int[] arr, int size) {
+		private static int getMin(int[] arr, int size) { // 배열의 최소값 리턴
 			int min = arr[0];
 	
 			for (int i = 1; i < size; i++) {
@@ -366,12 +366,12 @@ public class SortingTest {
                 int sortedPairsCount = 0;
 
                 for (int i = 0; i < value.length - 1; i++) {
-                    if (value[i] <= value[i + 1]) {
+                    if (value[i] <= value[i + 1]) { // i번째 원소가 i+1번째 원소보다 작거나 같을때, sortedPair 증가
                         sortedPairsCount++;
                     }
                 }
 
-                sortedRate = (double) sortedPairsCount / (value.length - 1);
+                sortedRate = (double) sortedPairsCount / (value.length - 1); // 비율 계산
             }
 
             if (sortedRate == 1.0) { // 만약 정렬되어 있는 배열이라면, Insertion sort 추천
@@ -381,19 +381,19 @@ public class SortingTest {
             // collisionRate 계산
             int hashMapSize = maxValue - minValue;
             int collisions = 0;
-            HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(hashMapSize);
+            HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(hashMapSize); // Ref : 자바 HashMap 사용 : HashMap을 이용하여 값의 중복도 확인
 
             for (int num : value) {
-                if (hashMap.containsKey(num)) {
+                if (hashMap.containsKey(num)) { // 만약 키 값이 이미 존재하면, collisions 증가
                     collisions++;
-                } else {
+                } else { // 키 값이 없을시, 키 값 추가
                  hashMap.put(num, num);
                 }
             }
 
-            double collisionRate = (double) collisions / value.length;
+            double collisionRate = (double) collisions / value.length; // 비율 계산
 
-            int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length());
+            int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length()); // 배열의 최대 자릿수 계산
             if (digits <= 0.241 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.9986) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
                 return 'R';
             }
