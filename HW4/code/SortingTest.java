@@ -395,7 +395,7 @@ public class SortingTest {
             double collisionRate = (double) collisions / value.length; // 비율 계산
 
             int digits = Math.max(Integer.toString(Math.abs(maxValue)).length(), Integer.toString(Math.abs(minValue)).length()); // 배열의 최대 자릿수 계산
-            if (digits <= 0.241 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.9986) { // 자릿수가 0.25 * log2(n)보다 작고, collisionRate가 0.99801보다 작다면, radix sort 추천
+            if (digits <= 0.241 * (Math.log(value.length) / Math.log(2)) && collisionRate <= 0.9986) { // 자릿수가 0.241 * log2(n)보다 작고, collisionRate가 0.9986보다 작다면, radix sort 추천
                 return 'R';
             }
 
