@@ -33,7 +33,7 @@ public class MatchingTemp
 		} else if (input.charAt(0) == '?') {
 			printLinkedList(input.substring(2), hashTable);
 		} else if (input.charAt(0) == '+') {
-			addNewLine(input.substring(2), hashTable, fileLine);
+			//addNewLine(input.substring(2), hashTable, fileLine);
 		} else if (input.charAt(0) == '/') {
 
 		} else {
@@ -44,7 +44,8 @@ public class MatchingTemp
 	private static void readFile(String filepath, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable, LinkedList<String> fileLine) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filepath));
         String line;
-        AVLTree<String, LinkedList<IndexTuple>> avlTree; 
+        AVLTree<String, LinkedList<IndexTuple>> avlTree;
+        AVLNode<String, LinkedList<IndexTuple>> avlNode;
         int i = 1;
         while((line = reader.readLine()) != null) {
 			fileLine.append(line);
@@ -56,8 +57,12 @@ public class MatchingTemp
                     avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
                     hashTable.put(asciiSumModulo(substring), avlTree);
                 } else {
-                    if (avlTree.startSearch(substring))
-                    avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+                    if (avlTree.startSearch(substring) != AVLTree.NIL) {
+                        avlNode = avlTree.startSearch(substring);
+                        avlNode.item.insert(new IndexTuple(i, j+1));
+                    } else {
+                        avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+                    }
                 }
             }
             i++;
@@ -73,7 +78,7 @@ public class MatchingTemp
         return sum % 100;
     }
 
-    private static void printAvlTree(String hashIndex, HashTable<String, AVLTree<IndexTuple, String>> hashTable) {
+    private static void printAvlTree(String hashIndex, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable) {
         AVLTree<String, LinkedList<IndexTuple>> avlTree; 
         avlTree = hashTable.get(Integer.parseInt(hashIndex));
         if (avlTree == null) {
@@ -83,7 +88,7 @@ public class MatchingTemp
         }
     }
 
-	private static void printLinkedList(String subString, HashTable<String, AVLTree<IndexTuple, String>> hashTable) {
+	private static void printLinkedList(String subString, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable) {
 		try{
 			AVLTree<String, LinkedList<IndexTuple>> avlTree;
 			LinkedList<IndexTuple> checkList, currentList;
@@ -92,7 +97,7 @@ public class MatchingTemp
 
 			avlTree = hashTable.get(asciiSumModulo(subString.substring(0, 6)));
 			if (avlTree != null) {
-				checkList = avlTree.startSearch(subString.substring(0, 6));
+				checkList = avlTree.startSearch(subString.substring(0, 6)).item.copy();
 			} else {
 				System.out.println("(0, 0)");
 				return;
@@ -102,7 +107,7 @@ public class MatchingTemp
 			for (int i=1; i<subString.length() - 5; i++) {
 				avlTree = hashTable.get(asciiSumModulo(subString.substring(i, i + 6)));
 				if (avlTree != null) {
-					currentList = avlTree.startSearch(subString.substring(i, i + 6));
+					currentList = avlTree.startSearch(subString.substring(i, i + 6)).item;
 					checkNode = checkList.head.next;
 					for (int j=0; j<checkList.numitems; j++) {
 						boolean hasNextSubString = false;
@@ -139,21 +144,28 @@ public class MatchingTemp
 		}
 	}
 
-	private static void addNewLine(String newLine ,HashTable<String, AVLTree<IndexTuple, String>> hashTable, LinkedList<String, String> fileLine) {
-		AVLTree<IndexTuple, String> avlTree;
-		fileLine.append(newLine);
-		for (int i = 0; i < newLine.length() - 5; i++) {
-			String substring = newLine.substring(i, i + 6);
-			avlTree = hashTable.get(asciiSumModulo(substring));
-			if (avlTree == null) {
-				avlTree = new AVLTree<>(new IndexTuple(fileLine.numitems, i), substring);
-				hashTable.put(asciiSumModulo(substring), avlTree);
-			} else {
-				avlTree.startInsert(new IndexTuple(i, i+1), substring);
-			}
-		}
-		System.out.println(fileLine.numitems);
-	}
+	// private static void addNewLine(String newLine, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable, LinkedList<String> fileLine) {
+	// 	AVLTree<String, LinkedList<IndexTuple>> avlTree;
+    //     AVLNode<String, LinkedList<IndexTuple>> avlNode;
+	// 	fileLine.append(newLine);
+	// 	for (int i = 0; i < newLine.length() - 5; i++) {
+	// 		String substring = newLine.substring(i, i + 6);
+	// 		avlTree = hashTable.get(asciiSumModulo(substring));
+	// 		if (avlTree == null) {
+    //             avlTree = new AVLTree<>();
+    //             avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+    //             hashTable.put(asciiSumModulo(substring), avlTree);
+    //         } else {
+    //             if (avlTree.startSearch(substring) != AVLTree.NIL) {
+    //                 avlNode = avlTree.startSearch(substring);
+    //                 avlNode.item.insert(new IndexTuple(i, j+1));
+    //             } else {
+    //                 avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+    //             }
+    //         }
+	// 	}
+	// 	System.out.println(fileLine.numitems);
+	// }
 }
 
 class LinkedListNode<T extends Comparable<T>> {
