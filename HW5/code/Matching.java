@@ -52,7 +52,7 @@ public class Matching
                 String substring = line.substring(j, j + 6);
                 avlTree = hashTable.get(asciiSumModulo(substring));
                 if (avlTree == null) {
-                    avlTree = new AVLTree(new IndexTuple(i, j+1), substring);
+                    avlTree = new AVLTree<>(new IndexTuple(i, j+1), substring);
                     hashTable.put(asciiSumModulo(substring), avlTree);
                 } else {
                     avlTree.startInsert(new IndexTuple(i, j+1), substring);
@@ -142,7 +142,7 @@ public class Matching
 			String substring = newLine.substring(i, i + 6);
 			avlTree = hashTable.get(asciiSumModulo(substring));
 			if (avlTree == null) {
-				avlTree = new AVLTree(new IndexTuple(i, i+1), substring);
+				avlTree = new AVLTree<>(new IndexTuple(i, i+1), substring);
 				hashTable.put(asciiSumModulo(substring), avlTree);
 			} else {
 				avlTree.startInsert(new IndexTuple(i, i+1), substring);
@@ -287,7 +287,7 @@ class AVLTree<T extends Comparable<T>, V extends Comparable<V>> {
 	}
 
     public AVLTree(T indexTuple, V value) {
-        root = new LinkedList(indexTuple, value, NIL, NIL, 1);
+        root = new LinkedList<T, V>(indexTuple, value, NIL, NIL, 1);
     }
 
     public LinkedList<T, V> getNIL() {
