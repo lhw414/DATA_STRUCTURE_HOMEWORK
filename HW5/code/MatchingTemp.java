@@ -102,7 +102,6 @@ public class MatchingTemp
 				System.out.println("(0, 0)");
 				return;
 			}
-			avlTree.preOrderPrint();
 
 			for (int i=1; i<subString.length() - 5; i++) {
 				avlTree = hashTable.get(asciiSumModulo(subString.substring(i, i + 6)));
