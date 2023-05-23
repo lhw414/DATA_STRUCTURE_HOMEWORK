@@ -105,11 +105,13 @@ public class Matching
 				avlTree = hashTable.get(asciiSumModulo(subString.substring(i, i + 6)));
 				if (avlTree != null) {
 					currentList = avlTree.startSearch(subString.substring(i, i + 6)).item;
+                    System.out.println(avlTree.startSearch(subString.substring(i, i + 6)).key);
 					checkNode = checkList.head.next;
 					for (int j=0; j<checkList.numitems; j++) {
 						boolean hasNextSubString = false;
 						currNode = currentList.head.next;
 						checkNodeIdxTuple = checkNode.indexTuple;
+                        System.out.println(checkNodeIdxTuple.toString());
 						checkNodeIdxTuple.addIndex2(i);
 						for (int k=0; k<currentList.numitems; k++) {
 							if (checkNode.indexTuple.compareTo(currNode.indexTuple) == 0) {
@@ -260,11 +262,13 @@ class LinkedList<T extends Comparable<T>> {
 
 	public void printIndexTuples() {
 		LinkedListNode<T> currentNode = this.head.next;
+        System.out.print(currentNode.indexTuple.toString());
+        currentNode = currentNode.next;
 		while (currentNode != null) {
-			System.out.print(currentNode.indexTuple.toString() + " ");
+			System.out.print(" " + currentNode.indexTuple.toString());
 			currentNode = currentNode.next;
 		}
-		System.out.println("");
+		System.out.println();
 	}
 
 }
