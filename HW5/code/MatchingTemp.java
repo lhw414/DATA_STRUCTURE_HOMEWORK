@@ -13,9 +13,21 @@ public class MatchingTemp
 			try
 			{
 				String input = br.readLine();
-				if (input.compareTo("QUIT") == 0)
+				if (input.compareTo("QUIT") == 0){
 					break;
-				command(input, hashtable, fileLine);
+                } else if (input.charAt(0) == '<') {
+                    hashtable = readFile(input.substring(input.lastIndexOf(" ") + 1), fileLine);
+                } else if (input.charAt(0) == '@') {
+                    printAvlTree(input.substring(input.lastIndexOf(" ") + 1), hashtable);
+                } else if (input.charAt(0) == '?') {
+                    printLinkedList(input.substring(2), hashtable);
+                } else if (input.charAt(0) == '+') {
+                    //addNewLine(input.substring(2), hashTable, fileLine);
+                } else if (input.charAt(0) == '/') {
+        
+                } else {
+                    throw new IOException(input, null);
+                }
 			}
 			catch (IOException e)
 			{
@@ -24,28 +36,12 @@ public class MatchingTemp
 		}
 	}
 
-	private static void command(String input, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable, LinkedList<String> fileLine) throws IOException
-	{
-		if (input.charAt(0) == '<') {
-			readFile(input.substring(input.lastIndexOf(" ") + 1), hashTable, fileLine);
-		} else if (input.charAt(0) == '@') {
-            printAvlTree(input.substring(input.lastIndexOf(" ") + 1), hashTable);
-		} else if (input.charAt(0) == '?') {
-			printLinkedList(input.substring(2), hashTable);
-		} else if (input.charAt(0) == '+') {
-			//addNewLine(input.substring(2), hashTable, fileLine);
-		} else if (input.charAt(0) == '/') {
-
-		} else {
-			throw new IOException(input, null);
-		}
-	}
-
-	private static void readFile(String filepath, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable, LinkedList<String> fileLine) throws IOException {
+	private static HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> readFile(String filepath, LinkedList<String> fileLine) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filepath));
         String line;
         AVLTree<String, LinkedList<IndexTuple>> avlTree;
         AVLNode<String, LinkedList<IndexTuple>> avlNode;
+        HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable = new HashTable<String, AVLTree<String, LinkedList<IndexTuple>>>();
         int i = 1;
         while((line = reader.readLine()) != null) {
 			fileLine.append(line);
@@ -54,20 +50,22 @@ public class MatchingTemp
                 avlTree = hashTable.get(asciiSumModulo(substring));
                 if (avlTree == null) {
                     avlTree = new AVLTree<>();
-                    avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+                    avlTree.startInsert(new AVLNode<>(substring, new LinkedList<>(new IndexTuple(i, j+1))));
                     hashTable.put(asciiSumModulo(substring), avlTree);
                 } else {
                     if (avlTree.startSearch(substring) != AVLTree.NIL) {
                         avlNode = avlTree.startSearch(substring);
-                        avlNode.item.insert(new IndexTuple(i, j+1));
+                        avlNode.item.append(new IndexTuple(i, j+1));
                     } else {
-                        avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+                        avlTree.startInsert(new AVLNode<>(substring, new LinkedList<>(new IndexTuple(i, j+1))));
                     }
                 }
             }
             i++;
         }
         reader.close();
+
+        return hashTable;
 	}
 
     private static int asciiSumModulo(String s) {
@@ -82,6 +80,7 @@ public class MatchingTemp
         AVLTree<String, LinkedList<IndexTuple>> avlTree; 
         avlTree = hashTable.get(Integer.parseInt(hashIndex));
         if (avlTree == null) {
+            System.out.println("tree null");
             System.out.println("EMPTY");
         } else {
             avlTree.preOrderPrint();
@@ -95,8 +94,10 @@ public class MatchingTemp
 			LinkedListNode<IndexTuple> checkNode, currNode;
 			IndexTuple checkNodeIdxTuple;
 
-			avlTree = hashTable.get(asciiSumModulo(subString.substring(0, 6)));
+			//avlTree = hashTable.get(asciiSumModulo(subString.substring(0, 6)));
+            avlTree = hashTable.get(asciiSumModulo("863009"));
 			if (avlTree != null) {
+                System.out.println("tree null");
 				checkList = avlTree.startSearch(subString.substring(0, 6)).item.copy();
 			} else {
 				System.out.println("(0, 0)");
@@ -295,7 +296,7 @@ class AVLNode<T extends Comparable<T>, V> {
 
 class AVLTree<T extends Comparable<T>, V> {
     private final int LL=1, LR=2, RR=3, RL=4, NO_NEED=0, ILLEGAL=-1;
-    public static final AVLNode NIL = new AVLNode(null, null, null, null, 0);
+    public static final AVLNode NIL = new AVLNode<>(null, null, null, null, 0);
     private AVLNode<T, V> root;
 
 	public AVLTree() {
@@ -384,6 +385,19 @@ class AVLTree<T extends Comparable<T>, V> {
 
         return returnList;
     }
+    
+    AVLNode<T, V> rotateLeft(AVLNode<T, V> t) {
+        AVLNode<T, V> RChild = t.right;
+        if (RChild == NIL) {
+            return NIL;
+        }
+        AVLNode<T, V> RLChild = RChild.left;
+        RChild.left = t;
+        t.right = RLChild;
+        t.height = 1 + Math.max(t.left.height, t.right.height);
+        RChild.height = 1 + Math.max(RChild.left.height, RChild.right.height);
+        return RChild;
+    }
 
     AVLNode<T, V> rotateRight(AVLNode<T, V> t) {
         AVLNode<T, V> LChild = t.left;
@@ -398,24 +412,11 @@ class AVLTree<T extends Comparable<T>, V> {
         return LChild;
     }
     
-    AVLNode<T, V> rotateLeft(AVLNode<T, V> t) {
-        AVLNode<T, V> RChild = t.right;
-        if (RChild == NIL || RChild == null) {
-            return NIL;
-        }
-        AVLNode<T, V> RLChild = RChild.left;
-        RChild.left = t;
-        t.right = RLChild;
-        t.height = 1 + Math.max(t.left.height, t.right.height);
-        RChild.height = 1 + Math.max(RChild.left.height, RChild.right.height);
-        return RChild;
-    }
-    
-    void startInsert(AVLNode<T, V> newNode) {
+    public void startInsert(AVLNode<T, V> newNode) {
         root = insert(root, newNode);
     }
 
-    AVLNode<T, V> insert(AVLNode<T, V> pNode, AVLNode<T, V> newNode) {
+    private AVLNode<T, V> insert(AVLNode<T, V> pNode, AVLNode<T, V> newNode) {
         if (pNode == NIL) {
             pNode = newNode;
         } else if (newNode.key.compareTo(pNode.key) < 0) {

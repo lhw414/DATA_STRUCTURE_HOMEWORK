@@ -1,4 +1,4 @@
-< ./testset/text/exponential.txt
+< ../testset/text/exponential.txt
 ? 863009
 ? 025915
 ? 473041
