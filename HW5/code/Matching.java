@@ -5,17 +5,29 @@ public class Matching
 	public static void main(String args[])
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        HashTable<String, AVLTree<IndexTuple, String>> hashtable = new HashTable<>();
-		LinkedList<String, String> fileLine = new LinkedList<>(null);
+        HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashtable = new HashTable<>();
+		LinkedList<String> fileLine = new LinkedList<>();
 
 		while (true)
 		{
 			try
 			{
 				String input = br.readLine();
-				if (input.compareTo("QUIT") == 0)
+				if (input.compareTo("QUIT") == 0){
 					break;
-				command(input, hashtable, fileLine);
+                } else if (input.charAt(0) == '<') {
+                    hashtable = readFile(input.substring(input.lastIndexOf(" ") + 1), fileLine);
+                } else if (input.charAt(0) == '@') {
+                    printAvlTree(input.substring(input.lastIndexOf(" ") + 1), hashtable);
+                } else if (input.charAt(0) == '?') {
+                    printLinkedList(input.substring(2), hashtable);
+                } else if (input.charAt(0) == '+') {
+                    //addNewLine(input.substring(2), hashTable, fileLine);
+                } else if (input.charAt(0) == '/') {
+        
+                } else {
+                    throw new IOException(input, null);
+                }
 			}
 			catch (IOException e)
 			{
@@ -24,27 +36,12 @@ public class Matching
 		}
 	}
 
-	private static void command(String input, HashTable<String, AVLTree<IndexTuple, String>> hashTable, LinkedList<String, String> fileLine) throws IOException
-	{
-		if (input.charAt(0) == '<') {
-			readFile(input.substring(input.lastIndexOf(" ") + 1), hashTable, fileLine);
-		} else if (input.charAt(0) == '@') {
-            printAvlTree(input.substring(input.lastIndexOf(" ") + 1), hashTable);
-		} else if (input.charAt(0) == '?') {
-			printLinkedList(input.substring(2), hashTable);
-		} else if (input.charAt(0) == '+') {
-			addNewLine(input.substring(2), hashTable, fileLine);
-		} else if (input.charAt(0) == '/') {
-
-		} else {
-			throw new IOException(input, null);
-		}
-	}
-
-	private static void readFile(String filepath, HashTable<String, AVLTree<IndexTuple, String>> hashTable, LinkedList<String, String> fileLine) throws IOException {
+	private static HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> readFile(String filepath, LinkedList<String> fileLine) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filepath));
         String line;
-        AVLTree<IndexTuple, String> avlTree; 
+        AVLTree<String, LinkedList<IndexTuple>> avlTree;
+        AVLNode<String, LinkedList<IndexTuple>> avlNode;
+        HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable = new HashTable<String, AVLTree<String, LinkedList<IndexTuple>>>();
         int i = 1;
         while((line = reader.readLine()) != null) {
 			fileLine.append(line);
@@ -52,15 +49,23 @@ public class Matching
                 String substring = line.substring(j, j + 6);
                 avlTree = hashTable.get(asciiSumModulo(substring));
                 if (avlTree == null) {
-                    avlTree = new AVLTree<>(new IndexTuple(i, j+1), substring);
+                    avlTree = new AVLTree<>();
+                    avlTree.insert(new AVLNode<>(substring, new LinkedList<>(new IndexTuple(i, j+1))));
                     hashTable.put(asciiSumModulo(substring), avlTree);
                 } else {
-                    avlTree.startInsert(new IndexTuple(i, j+1), substring);
+                    if (avlTree.startSearch(substring) != AVLTree.NIL) {
+                        avlNode = avlTree.startSearch(substring);
+                        avlNode.item.append(new IndexTuple(i, j+1));
+                    } else {
+                        avlTree.insert(new AVLNode<>(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+                    }
                 }
             }
             i++;
         }
         reader.close();
+
+        return hashTable;
 	}
 
     private static int asciiSumModulo(String s) {
@@ -71,8 +76,8 @@ public class Matching
         return sum % 100;
     }
 
-    private static void printAvlTree(String hashIndex, HashTable<String, AVLTree<IndexTuple, String>> hashTable) {
-        AVLTree<IndexTuple, String> avlTree; 
+    private static void printAvlTree(String hashIndex, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable) {
+        AVLTree<String, LinkedList<IndexTuple>> avlTree; 
         avlTree = hashTable.get(Integer.parseInt(hashIndex));
         if (avlTree == null) {
             System.out.println("EMPTY");
@@ -81,26 +86,25 @@ public class Matching
         }
     }
 
-	private static void printLinkedList(String subString, HashTable<String, AVLTree<IndexTuple, String>> hashTable) {
+	private static void printLinkedList(String subString, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable) {
 		try{
-			AVLTree<IndexTuple, String> avlTree;
-			LinkedList<IndexTuple, String> checkList, currentList;
+			AVLTree<String, LinkedList<IndexTuple>> avlTree;
+			LinkedList<IndexTuple> checkList, currentList;
 			LinkedListNode<IndexTuple> checkNode, currNode;
 			IndexTuple checkNodeIdxTuple;
 
 			avlTree = hashTable.get(asciiSumModulo(subString.substring(0, 6)));
 			if (avlTree != null) {
-				checkList = avlTree.startSearch(subString.substring(0, 6)).copy();
+				checkList = avlTree.startSearch(subString.substring(0, 6)).item.copy();
 			} else {
 				System.out.println("(0, 0)");
 				return;
 			}
-			avlTree.preOrderPrint();
 
 			for (int i=1; i<subString.length() - 5; i++) {
 				avlTree = hashTable.get(asciiSumModulo(subString.substring(i, i + 6)));
 				if (avlTree != null) {
-					currentList = avlTree.startSearch(subString.substring(i, i + 6));
+					currentList = avlTree.startSearch(subString.substring(i, i + 6)).item;
 					checkNode = checkList.head.next;
 					for (int j=0; j<checkList.numitems; j++) {
 						boolean hasNextSubString = false;
@@ -137,21 +141,28 @@ public class Matching
 		}
 	}
 
-	private static void addNewLine(String newLine ,HashTable<String, AVLTree<IndexTuple, String>> hashTable, LinkedList<String, String> fileLine) {
-		AVLTree<IndexTuple, String> avlTree;
-		fileLine.append(newLine);
-		for (int i = 0; i < newLine.length() - 5; i++) {
-			String substring = newLine.substring(i, i + 6);
-			avlTree = hashTable.get(asciiSumModulo(substring));
-			if (avlTree == null) {
-				avlTree = new AVLTree<>(new IndexTuple(fileLine.numitems, i), substring);
-				hashTable.put(asciiSumModulo(substring), avlTree);
-			} else {
-				avlTree.startInsert(new IndexTuple(i, i+1), substring);
-			}
-		}
-		System.out.println(fileLine.numitems);
-	}
+	// private static void addNewLine(String newLine, HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable, LinkedList<String> fileLine) {
+	// 	AVLTree<String, LinkedList<IndexTuple>> avlTree;
+    //     AVLNode<String, LinkedList<IndexTuple>> avlNode;
+	// 	fileLine.append(newLine);
+	// 	for (int i = 0; i < newLine.length() - 5; i++) {
+	// 		String substring = newLine.substring(i, i + 6);
+	// 		avlTree = hashTable.get(asciiSumModulo(substring));
+	// 		if (avlTree == null) {
+    //             avlTree = new AVLTree<>();
+    //             avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+    //             hashTable.put(asciiSumModulo(substring), avlTree);
+    //         } else {
+    //             if (avlTree.startSearch(substring) != AVLTree.NIL) {
+    //                 avlNode = avlTree.startSearch(substring);
+    //                 avlNode.item.insert(new IndexTuple(i, j+1));
+    //             } else {
+    //                 avlTree.startInsert(new AVLNode(substring, new LinkedList<>(new IndexTuple(i, j+1))));
+    //             }
+    //         }
+	// 	}
+	// 	System.out.println(fileLine.numitems);
+	// }
 }
 
 class LinkedListNode<T extends Comparable<T>> {
@@ -164,40 +175,19 @@ class LinkedListNode<T extends Comparable<T>> {
     }
 }
 
-class LinkedList<T extends Comparable<T>, V extends Comparable<V>> {
+class LinkedList<T extends Comparable<T>> {
     LinkedListNode<T> head; // dummy head
-    V value;
     int numitems;
-    int height;
-    LinkedList<T, V> left, right;
 
-    public LinkedList(V value) {
+    public LinkedList() {
         this.head = new LinkedListNode<T>(null);
-		this.head.next = null;
-        this.left = AVLTree.NIL;
-        this.right = AVLTree.NIL;
-        this.value = value;
+        this.head.next = new LinkedListNode<T>(null);
         numitems = 0;
-        height = 1;
     }
 
-    public LinkedList(T indexTuple, V value) {
+    public LinkedList(T indexTuple) {
         this.head = new LinkedListNode<T>(null);
         this.head.next = new LinkedListNode<T>(indexTuple);
-        this.left = AVLTree.NIL;
-        this.right = AVLTree.NIL;
-        this.value = value;
-        numitems = 1;
-        height = 1;
-    }
-
-    public LinkedList(T indexTuple, V value, LinkedList<T, V> left, LinkedList<T, V> right, int heigth) {
-        this.head = new LinkedListNode<T>(null);
-        this.head.next = new LinkedListNode<T>(indexTuple);
-        this.left = left;
-        this.right = right;
-        this.value = value;
-        this.height = heigth;
         numitems = 1;
     }
 
@@ -250,10 +240,9 @@ class LinkedList<T extends Comparable<T>, V extends Comparable<V>> {
         return null;
     }
 
-	public LinkedList<T, V> copy() {
+	public LinkedList<T> copy() {
 		// Create a new linked list with the same value
-		LinkedList<T, V> newList = new LinkedList<>(this.value);
-		newList.height = this.height;
+		LinkedList<T> newList = new LinkedList<>();
 		newList.numitems = this.numitems;
 		
 		// Copy the linked list
@@ -280,159 +269,169 @@ class LinkedList<T extends Comparable<T>, V extends Comparable<V>> {
 
 }
 
-class AVLTree<T extends Comparable<T>, V extends Comparable<V>> {
+class AVLNode<T extends Comparable<T>, V> {
+    public T key;
+    public AVLNode<T, V> left, right;
+    public int height;
+    public V item;
+
+    public AVLNode(T key, V item) {
+        this.key = key;
+        this.item = item;
+        this.left = this.right = AVLTree.NIL;
+        this.height = 1;
+    }
+
+    public AVLNode(T key, V item, AVLNode<T, V> leftChild, AVLNode<T, V> rightChild, int height) {
+        this.key = key;
+        this.item = item;
+        this.left = leftChild;
+        this.right = rightChild;
+        this.height = height;
+    }
+}
+
+class AVLTree<T extends Comparable<T>, V> {
     private final int LL=1, LR=2, RR=3, RL=4, NO_NEED=0, ILLEGAL=-1;
-    public static final LinkedList NIL = new LinkedList<>(null, null, null, null, 0);
-    private LinkedList<T, V> root;
+    public static final AVLNode NIL = new AVLNode<>(null, null, null, null, 0);
+    private AVLNode<T, V> root;
 
 	public AVLTree() {
 		root = NIL;
 	}
 
-    public AVLTree(T indexTuple, V value) {
-        root = new LinkedList<T, V>(indexTuple, value, NIL, NIL, 1);
-    }
-
-    public LinkedList<T, V> getNIL() {
-        return NIL;
-    }
-
-	public LinkedList<T, V> startSearch(V value) {
+	public AVLNode<T, V> startSearch(T value) {
 		return searchList(root, value);
 	}
 
-	public LinkedList<T, V> searchList(LinkedList<T, V> linkedList, V value) {
-		if (linkedList == NIL || linkedList == null) {
+	public AVLNode<T, V> searchList(AVLNode<T, V> node, T value) {
+		if (node == NIL) {
 			return NIL;
-		} else if (value.compareTo(linkedList.value) == 0) {
-			return linkedList;
-		} else if (value.compareTo(linkedList.value) < 0) {
-			return searchList(linkedList.left, value);
+		} else if (value.compareTo(node.key) == 0) {
+			return node;
+		} else if (value.compareTo(node.key) < 0) {
+			return searchList(node.left, value);
 		} else {
-			return searchList(linkedList.right, value);
+			return searchList(node.right, value);
 		}
 	}
 
 	public void preOrderPrint() {
-		if (root == null || root == NIL) {
+		if (root == NIL) {
 			System.out.println("EMPTY");
 		} else {
-			System.out.print(this.root.value);
-            if (root.left != null && root.left != NIL) {
+			System.out.print(this.root.key);
+            if (root.left != NIL) {
                 preOrderPrint(root.left);
             }
-			if (root.right != null && root.right != NIL) {
+			if (root.right != NIL) {
                 preOrderPrint(root.right);
             }
             System.out.println("");
 		}
 	}
 
-	public void preOrderPrint(LinkedList<T, V> currentList) {
-		System.out.print(" " + currentList.value);
-        if (currentList.left != null && currentList.left != NIL) {
-            preOrderPrint(currentList.left);
+	public void preOrderPrint(AVLNode<T, V> node) {
+		System.out.print(" " + node.key);
+        if (node.left != NIL) {
+            preOrderPrint(node.left);
         }
-		if (currentList.right != null && currentList.right != NIL) {
-            preOrderPrint(currentList.right);
+		if (node.right != NIL) {
+            preOrderPrint(node.right);
         }
 	}
 
-    private int needBalance(LinkedList<T, V> linkedlist) {
+    private int needBalance(AVLNode<T, V> node){
         int type = ILLEGAL;
-        if (linkedlist.left.height + 2 <= linkedlist.right.height) {
-            if (linkedlist.right.left.height <= linkedlist.right.right.height) {
+        if (node.left.height + 2 <= node.right.height){ // type R
+            if (node.right.left.height <= node.right.right.height){
                 type = RR;
-            } else {
+            } else{
                 type = RL;
-                }
-        } else if (linkedlist.left.height >= linkedlist.right.height + 2) {
-            if (linkedlist.left.left.height >= linkedlist.left.right.height) {
+            }
+        } else if (node.left.height >= node.right.height + 2){ // type L
+            if (node.left.left.height >= node.left.right.height){
                 type = LL;
-            } else {
+            } else{
                 type = LR;
             }
-        } else {
+        } else{
             type = NO_NEED;
         }
         return type;
     }
 
-    private LinkedList<T, V> balanceAVL(LinkedList<T, V> linkedList, int type) {
-        LinkedList<T, V> returnList = NIL;
-        switch (type) {
-            case LL:
-                returnList = rotateRight(linkedList);
-                break;
-            case LR:
-                linkedList.left = rotateLeft(linkedList.left);
-                returnList = rotateRight(linkedList);
-                break;
-            case RR:
-                returnList = rotateLeft(linkedList);
-                break;
-            case RL:
-                linkedList.right = rotateRight(linkedList);
-                returnList = rotateLeft(linkedList);
-                break;
+    private AVLNode<T, V> balanceAVLTree(AVLNode<T, V> rotateNode, int type){
+        AVLNode<T, V> returnNode = NIL;
+        if (type == LL){
+            returnNode = rightRotate(rotateNode);
+        }else if (type == LR){
+            rotateNode.left = leftRotate(rotateNode.left);
+            returnNode = rightRotate(rotateNode);
+        }else if (type == RR){
+            returnNode = leftRotate(rotateNode);
+        }else if (type == RL){
+            rotateNode.right = rightRotate(rotateNode.right);
+            returnNode = leftRotate(rotateNode);
         }
-
-        return returnList;
+        return returnNode;
     }
 
-    LinkedList<T, V> rotateRight(LinkedList<T, V> t) {
-        LinkedList<T, V> LChild = t.left;
-        if (LChild == NIL || LChild == null) {
-            return NIL;
-        }
-        LinkedList<T, V> LRChild = LChild.right;
-        LChild.right = t;
-        t.left = LRChild;
-        t.height = 1 + Math.max(t.left.height, t.right.height);
-        LChild.height = 1 + Math.max(LChild.left.height, LChild.right.height);
-        return LChild;
-    }
-    
-    LinkedList<T, V> rotateLeft(LinkedList<T, V> t) {
-        LinkedList<T, V> RChild = t.right;
-        if (RChild == NIL || RChild == null) {
-            return NIL;
-        }
-        LinkedList<T, V> RLChild = RChild.left;
-        RChild.left = t;
-        t.right = RLChild;
-        t.height = 1 + Math.max(t.left.height, t.right.height);
-        RChild.height = 1 + Math.max(RChild.left.height, RChild.right.height);
+    private AVLNode<T, V> leftRotate(AVLNode<T, V> rotateNode){
+        AVLNode<T, V> RChild = rotateNode.right;
+
+        if (RChild == NIL) return NIL;
+
+        AVLNode<T, V> RLChild = RChild.left;
+        RChild.left = rotateNode;
+        rotateNode.right = RLChild;
+
+        rotateNode.height = Math.max(rotateNode.left.height, rotateNode.right.height) + 1;
+        RChild.height = Math.max(RChild.left.height, RChild.right.height) + 1;
         return RChild;
     }
-    
-    void startInsert(T indexTuple, V value) {
-        root = insert(root, indexTuple, value);
+
+    private AVLNode<T, V> rightRotate(AVLNode<T, V> rotateNode){
+        AVLNode<T, V> LChild = rotateNode.left;
+
+        if (LChild == NIL) return NIL;
+
+        AVLNode<T, V> LRChild = LChild.right;
+        LChild.right = rotateNode;
+        rotateNode.left = LRChild;
+
+        rotateNode.height = Math.max(rotateNode.left.height, rotateNode.right.height) + 1;
+        LChild.height = Math.max(LChild.left.height, LChild.right.height) + 1;
+        return LChild;
     }
 
-    LinkedList<T, V> insert(LinkedList<T, V> linkedList, T indexTuple, V value) {
-        if (linkedList == NIL || linkedList == null) {
-            linkedList =  new LinkedList<>(indexTuple, value, NIL, NIL, 1);
-        } else if (value.compareTo(linkedList.value) < 0) {
-            linkedList.left = insert(linkedList.left, indexTuple, value);
-            linkedList.height = 1 + Math.max(linkedList.left.height, linkedList.right.height);
-            int type = needBalance(linkedList);
-            if (type != NO_NEED) {
-                linkedList = balanceAVL(linkedList, type);
+    public void insert(AVLNode<T, V> newNode){
+        root = insertItem(root, newNode);
+    }
+
+    private AVLNode<T, V> insertItem(AVLNode<T, V> tNode, AVLNode<T, V> newNode){
+        int type;
+        if (tNode == NIL){
+            tNode = newNode;
+        } else if (newNode.key.compareTo(tNode.key) < 0){
+            tNode.left = insertItem(tNode.left, newNode);
+            tNode.height = 1 + Math.max(tNode.right.height, tNode.left.height);
+            type = needBalance(tNode);
+            if (type != NO_NEED){
+                tNode = balanceAVLTree(tNode, type);
             }
-        } else if (value.compareTo(linkedList.value) > 0) {
-            linkedList.right = insert(linkedList.right, indexTuple, value);
-            linkedList.height = 1 + Math.max(linkedList.left.height, linkedList.right.height);
-            int type = needBalance(linkedList);
-            if (type != NO_NEED) {
-                linkedList = balanceAVL(linkedList, type);
+        } else{
+            tNode.right = insertItem(tNode.right, newNode);
+            tNode.height = 1 + Math.max(tNode.right.height, tNode.left.height);
+            type = needBalance(tNode);
+            if (type != NO_NEED){
+                tNode = balanceAVLTree(tNode, type);
             }
-        } else if (value.compareTo(linkedList.value) == 0) {
-            linkedList.insert(indexTuple);
         }
-        return linkedList;
+        return tNode;
     }
 }
+
 
 class HashTable<K, V> {
     private static final int DEFAULT_SIZE = 100;
@@ -487,3 +486,4 @@ class IndexTuple implements Comparable<IndexTuple> {
         return "(" + index1 + ", " + index2 + ")";
     }
 }
+
