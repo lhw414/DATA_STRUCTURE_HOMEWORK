@@ -23,7 +23,7 @@ public class Matching {
         } else if (input.charAt(0) == '+') {
           addNewLine(input.substring(2), hashtable, fileLine);
         } else if (input.charAt(0) == '/') {
-            //
+          deleteSubstring(input.substring(2), hashtable, fileLine);
         } else {
           throw new IOException(input, null);
         }
@@ -181,7 +181,10 @@ public class Matching {
       if (avlTree == null) {
         avlTree = new AVLTree<>();
         avlTree.insert(
-          new AVLNode<>(substring, new LinkedList<>(new IndexTuple(fileLine.numitems, i + 1)))
+          new AVLNode<>(
+            substring,
+            new LinkedList<>(new IndexTuple(fileLine.numitems, i + 1))
+          )
         );
         hashTable.put(asciiSumModulo(substring), avlTree);
       } else {
@@ -190,12 +193,62 @@ public class Matching {
           avlNode.item.append(new IndexTuple(fileLine.numitems, i + 1));
         } else {
           avlTree.insert(
-            new AVLNode<>(substring, new LinkedList<>(new IndexTuple(fileLine.numitems, i + 1)))
+            new AVLNode<>(
+              substring,
+              new LinkedList<>(new IndexTuple(fileLine.numitems, i + 1))
+            )
           );
         }
       }
     }
     System.out.println(fileLine.numitems);
+  }
+
+  private static HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> deleteSubstring(
+    String substring,
+    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable,
+    LinkedList<String> fileLine
+  ) {
+    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> newHashTable = new HashTable<>();
+    AVLTree<String, LinkedList<IndexTuple>> avlTree = hashTable.get(
+      asciiSumModulo(substring)
+    );
+    LinkedList<IndexTuple> idxTuple;
+    int deleteNumItems = 0;
+
+    if (avlTree != null) {
+      AVLNode<String, LinkedList<IndexTuple>> avlNode = avlTree.startSearch(
+        substring
+      );
+      if (avlNode != AVLTree.NIL) {
+        deleteNumItems = avlNode.item.numitems;
+        idxTuple = avlNode.item;
+        System.out.println(deleteNumItems);
+        for (int i = 1; i < fileLine.numitems + 1; i++) {
+          StringBuilder sb = new StringBuilder();
+          String line = fileLine.get(i);
+          int[] deleteindex = new int[line.length()];
+          for (int j = 1; j < idxTuple.numitems + 1; j++) {
+            IndexTuple idx = idxTuple.get(j);
+            if (idx.getIndex1() == i) {
+                for (int k=0; k<6; k++){
+                    deleteindex[k] = -1;
+                }
+            }
+          }
+          for (int j = 0; j < line.length(); j++) {
+            if (deleteindex[j] != -1) {
+                sb.append(line.charAt(j));
+            }
+          }
+          System.out.println(sb.toString());
+        }
+      }
+    }
+
+    fileLine.printIndexTuples();
+
+    return newHashTable;
   }
 }
 
@@ -296,6 +349,32 @@ class LinkedList<T extends Comparable<T>> {
     }
 
     return newList;
+  }
+
+  public T get(int index) {
+    if (index < 0 || index >= numitems) {
+      throw new IndexOutOfBoundsException("Invalid index");
+    }
+
+    LinkedListNode<T> currentNode = head.next;
+    for (int i = 0; i < index; i++) {
+      currentNode = currentNode.next;
+    }
+
+    return currentNode.indexTuple;
+  }
+
+  public void set(int index, T value) {
+    if (index < 0 || index >= numitems) {
+      throw new IndexOutOfBoundsException("Invalid index");
+    }
+
+    LinkedListNode<T> currentNode = head.next;
+    for (int i = 0; i < index; i++) {
+      currentNode = currentNode.next;
+    }
+
+    currentNode.indexTuple = value;
   }
 
   public void printIndexTuples() {
@@ -480,6 +559,89 @@ class AVLTree<T extends Comparable<T>, V> {
       }
     }
     return tNode;
+  }
+
+  public void delete(T item) {
+    root = findAndDelete(root, item);
+  }
+
+  private AVLNode<T, V> findAndDelete(AVLNode<T, V> parentNode, T item) {
+    if (parentNode == NIL) {
+      return NIL;
+    } else {
+      if (item.compareTo(parentNode.key) == 0) {
+        parentNode = deleteNode(parentNode);
+      } else if (item.compareTo(parentNode.key) < 0) {
+        parentNode.left = findAndDelete(parentNode.left, item);
+        parentNode.height =
+          1 + Math.max(parentNode.right.height, parentNode.left.height);
+        int type = needBalance(parentNode);
+        if (type != NO_NEED) {
+          parentNode = balanceAVLTree(parentNode, type);
+        }
+      } else {
+        parentNode.right = findAndDelete(parentNode.right, item);
+        parentNode.height =
+          1 + Math.max(parentNode.right.height, parentNode.left.height);
+        int type = needBalance(parentNode);
+        if (type != NO_NEED) {
+          parentNode = balanceAVLTree(parentNode, type);
+        }
+      }
+      return parentNode;
+    }
+  }
+
+  private AVLNode<T, V> deleteNode(AVLNode<T, V> parentNode) {
+    if ((parentNode.left == NIL) && (parentNode.right == NIL)) {
+      return NIL;
+    } else if (parentNode.left == NIL) {
+      return parentNode.right;
+    } else if (parentNode.right == NIL) {
+      return parentNode.left;
+    } else {
+      returnPair rPair = deleteMinItem(parentNode.right);
+      parentNode.key = rPair.item;
+      parentNode.right = rPair.node;
+
+      parentNode.height =
+        1 + Math.max(parentNode.right.height, parentNode.left.height);
+      int type = needBalance(parentNode);
+      if (type != NO_NEED) {
+        parentNode = balanceAVLTree(parentNode, type);
+      }
+      return parentNode;
+    }
+  }
+
+  private returnPair deleteMinItem(AVLNode<T, V> parentNode) {
+    if (parentNode.left == NIL) {
+      return new returnPair(parentNode.key, parentNode.right);
+    } else {
+      returnPair rPair = deleteMinItem(parentNode.left);
+      parentNode.left = rPair.node;
+
+      parentNode.height =
+        1 + Math.max(parentNode.right.height, parentNode.left.height);
+      int type = needBalance(parentNode);
+      if (type != NO_NEED) {
+        parentNode = balanceAVLTree(parentNode, type);
+      }
+
+      rPair.node = parentNode;
+      return rPair;
+    }
+  }
+
+  private class returnPair {
+
+    T item;
+    AVLNode<T, V> node;
+
+    private returnPair(T item, AVLNode<T, V> node) {
+      this.item = item;
+      this.node = node;
+    }
   }
 }
 
