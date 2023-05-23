@@ -100,22 +100,21 @@ public class Matching
 				System.out.println("(0, 0)");
 				return;
 			}
-
 			for (int i=1; i<subString.length() - 5; i++) {
 				avlTree = hashTable.get(asciiSumModulo(subString.substring(i, i + 6)));
 				if (avlTree != null) {
-					currentList = avlTree.startSearch(subString.substring(i, i + 6)).item;
-                    System.out.println(avlTree.startSearch(subString.substring(i, i + 6)).key);
+					currentList = avlTree.startSearch(subString.substring(i, i + 6)).item.copy();
 					checkNode = checkList.head.next;
-					for (int j=0; j<checkList.numitems; j++) {
+                    int checkListLength = checkList.numitems;
+					for (int j=0; j<checkListLength; j++) {
 						boolean hasNextSubString = false;
 						currNode = currentList.head.next;
 						checkNodeIdxTuple = checkNode.indexTuple;
-                        System.out.println(checkNodeIdxTuple.toString());
 						checkNodeIdxTuple.addIndex2(i);
 						for (int k=0; k<currentList.numitems; k++) {
 							if (checkNode.indexTuple.compareTo(currNode.indexTuple) == 0) {
 								hasNextSubString = true;
+                                break;
 							}
 							currNode = currNode.next;
 						}
