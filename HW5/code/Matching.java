@@ -23,7 +23,7 @@ public class Matching {
         } else if (input.charAt(0) == '+') {
           addNewLine(input.substring(2), hashtable, fileLine);
         } else if (input.charAt(0) == '/') {
-          deleteSubstring(input.substring(2), hashtable, fileLine);
+          hashtable = deleteSubstring(input.substring(2), hashtable, fileLine);
         } else {
           throw new IOException(input, null);
         }
@@ -224,31 +224,62 @@ public class Matching {
         deleteNumItems = avlNode.item.numitems;
         idxTuple = avlNode.item;
         System.out.println(deleteNumItems);
-        for (int i = 1; i < fileLine.numitems + 1; i++) {
+        for (int i = 0; i < fileLine.numitems; i++) {
           StringBuilder sb = new StringBuilder();
           String line = fileLine.get(i);
           int[] deleteindex = new int[line.length()];
-          for (int j = 1; j < idxTuple.numitems + 1; j++) {
+          for (int j = 0; j < idxTuple.numitems; j++) {
             IndexTuple idx = idxTuple.get(j);
-            if (idx.getIndex1() == i) {
-                for (int k=0; k<6; k++){
-                    deleteindex[k] = -1;
-                }
+            if (idx.getIndex1() == i + 1) {
+              for (int k = 0; k < 6; k++) {
+                deleteindex[idx.getIndex2() + k - 1] = -100;
+              }
             }
           }
           for (int j = 0; j < line.length(); j++) {
-            if (deleteindex[j] != -1) {
-                sb.append(line.charAt(j));
+            if (deleteindex[j] != -100) {
+              sb.append(line.charAt(j));
             }
           }
-          System.out.println(sb.toString());
+          fileLine.set(i, sb.toString());
         }
+        for (int i=0; i<fileLine.numitems; i++) {
+          String line = fileLine.get(i);
+          if (line.length() < 6) {
+            continue;
+          }
+          for (int j = 0; j < line.length() - 5; j++) {
+            substring = line.substring(j, j + 6);
+            avlTree = newHashTable.get(asciiSumModulo(substring));
+            if (avlTree == null) {
+              avlTree = new AVLTree<>();
+              avlTree.insert(
+                new AVLNode<>(
+                  substring,
+                  new LinkedList<>(new IndexTuple(i+1, j + 1))
+                )
+              );
+              newHashTable.put(asciiSumModulo(substring), avlTree);
+            } else {
+              if (avlTree.startSearch(substring) != AVLTree.NIL) {
+                avlNode = avlTree.startSearch(substring);
+                avlNode.item.append(new IndexTuple(i+1, j + 1));
+              } else {
+                avlTree.insert(
+                  new AVLNode<>(
+                    substring,
+                    new LinkedList<>(new IndexTuple(i+1, j + 1))
+                  )
+                );
+              }
+            }
+          }
+        }
+        return newHashTable;
       }
     }
 
-    fileLine.printIndexTuples();
-
-    return newHashTable;
+    return hashTable;
   }
 }
 
@@ -270,7 +301,7 @@ class LinkedList<T extends Comparable<T>> {
 
   public LinkedList() {
     this.head = new LinkedListNode<T>(null);
-    this.head.next = new LinkedListNode<T>(null);
+    this.head.next = null;
     numitems = 0;
   }
 
