@@ -243,7 +243,7 @@ public class Matching {
           }
           fileLine.set(i, sb.toString());
         }
-        for (int i=0; i<fileLine.numitems; i++) {
+        for (int i = 0; i < fileLine.numitems; i++) {
           String line = fileLine.get(i);
           if (line.length() < 6) {
             continue;
@@ -256,19 +256,19 @@ public class Matching {
               avlTree.insert(
                 new AVLNode<>(
                   substring,
-                  new LinkedList<>(new IndexTuple(i+1, j + 1))
+                  new LinkedList<>(new IndexTuple(i + 1, j + 1))
                 )
               );
               newHashTable.put(asciiSumModulo(substring), avlTree);
             } else {
               if (avlTree.startSearch(substring) != AVLTree.NIL) {
                 avlNode = avlTree.startSearch(substring);
-                avlNode.item.append(new IndexTuple(i+1, j + 1));
+                avlNode.item.append(new IndexTuple(i + 1, j + 1));
               } else {
                 avlTree.insert(
                   new AVLNode<>(
                     substring,
-                    new LinkedList<>(new IndexTuple(i+1, j + 1))
+                    new LinkedList<>(new IndexTuple(i + 1, j + 1))
                   )
                 );
               }
