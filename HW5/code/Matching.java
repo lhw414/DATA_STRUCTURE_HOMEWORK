@@ -630,77 +630,77 @@ class AVLTree<T extends Comparable<T>, V> {
   }
 
   // Method : start deleting item in avl tree
-  public void delete(T item) {
-    root = findAndDelete(root, item);
+  public void delete(T value) {
+    root = findAndDelete(root, value);
   }
 
   // Method : delete item in avl tree
-  private AVLNode<T, V> findAndDelete(AVLNode<T, V> parentNode, T item) {
-    if (parentNode == NIL) {
+  private AVLNode<T, V> findAndDelete(AVLNode<T, V> pNode, T value) {
+    if (pNode == NIL) {
       return NIL;
     } else {
-      if (item.compareTo(parentNode.key) == 0) {
-        parentNode = deleteNode(parentNode);
-      } else if (item.compareTo(parentNode.key) < 0) {
-        parentNode.left = findAndDelete(parentNode.left, item);
-        parentNode.height =
-          1 + Math.max(parentNode.right.height, parentNode.left.height);
-        int type = needBalance(parentNode);
+      if (value.compareTo(pNode.key) == 0) {
+        pNode = deleteNode(pNode);
+      } else if (value.compareTo(pNode.key) < 0) {
+        pNode.left = findAndDelete(pNode.left, value);
+        pNode.height =
+          1 + Math.max(pNode.right.height, pNode.left.height);
+        int type = needBalance(pNode);
         if (type != NO_NEED) {
-          parentNode = balanceAVLTree(parentNode, type);
+          pNode = balanceAVLTree(pNode, type);
         }
       } else {
-        parentNode.right = findAndDelete(parentNode.right, item);
-        parentNode.height =
-          1 + Math.max(parentNode.right.height, parentNode.left.height);
-        int type = needBalance(parentNode);
+        pNode.right = findAndDelete(pNode.right, value);
+        pNode.height =
+          1 + Math.max(pNode.right.height, pNode.left.height);
+        int type = needBalance(pNode);
         if (type != NO_NEED) {
-          parentNode = balanceAVLTree(parentNode, type);
+          pNode = balanceAVLTree(pNode, type);
         }
       }
-      return parentNode;
+      return pNode;
     }
   }
 
   // Method : delete node from avl tree
-  private AVLNode<T, V> deleteNode(AVLNode<T, V> parentNode) {
-    if ((parentNode.left == NIL) && (parentNode.right == NIL)) {
+  private AVLNode<T, V> deleteNode(AVLNode<T, V> pNode) {
+    if ((pNode.left == NIL) && (pNode.right == NIL)) {
       return NIL;
-    } else if (parentNode.left == NIL) {
-      return parentNode.right;
-    } else if (parentNode.right == NIL) {
-      return parentNode.left;
+    } else if (pNode.left == NIL) {
+      return pNode.right;
+    } else if (pNode.right == NIL) {
+      return pNode.left;
     } else {
-      returnPair rPair = deleteMinItem(parentNode.right);
-      parentNode.key = rPair.item;
-      parentNode.right = rPair.node;
+      returnPair rPair = deleteMinItem(pNode.right);
+      pNode.key = rPair.item;
+      pNode.right = rPair.node;
 
-      parentNode.height =
-        1 + Math.max(parentNode.right.height, parentNode.left.height);
-      int type = needBalance(parentNode);
+      pNode.height =
+        1 + Math.max(pNode.right.height, pNode.left.height);
+      int type = needBalance(pNode);
       if (type != NO_NEED) {
-        parentNode = balanceAVLTree(parentNode, type);
+        pNode = balanceAVLTree(pNode, type);
       }
-      return parentNode;
+      return pNode;
     }
   }
 
   // delete min item from tree
-  private returnPair deleteMinItem(AVLNode<T, V> parentNode) {
-    if (parentNode.left == NIL) {
-      return new returnPair(parentNode.key, parentNode.right);
+  private returnPair deleteMinItem(AVLNode<T, V> pNode) {
+    if (pNode.left == NIL) {
+      return new returnPair(pNode.key, pNode.right);
     } else {
-      returnPair rPair = deleteMinItem(parentNode.left);
-      parentNode.left = rPair.node;
+      returnPair rPair = deleteMinItem(pNode.left);
+      pNode.left = rPair.node;
 
-      parentNode.height =
-        1 + Math.max(parentNode.right.height, parentNode.left.height);
-      int type = needBalance(parentNode);
+      pNode.height =
+        1 + Math.max(pNode.right.height, pNode.left.height);
+      int type = needBalance(pNode);
       if (type != NO_NEED) {
-        parentNode = balanceAVLTree(parentNode, type);
+        pNode = balanceAVLTree(pNode, type);
       }
 
-      rPair.node = parentNode;
+      rPair.node = pNode;
       return rPair;
     }
   }
