@@ -4,7 +4,7 @@ public class Matching {
 
   public static void main(String args[]) {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashtable = new HashTable<>();
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashtable = new HashTable<>();
     LinkedList<String> fileLine = new LinkedList<>();
 
     while (true) {
@@ -33,14 +33,14 @@ public class Matching {
     }
   }
 
-  private static HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> readFile(
+  private static HashTable<AVLTree<String, LinkedList<IndexTuple>>> readFile(
     String filepath
   ) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filepath));
     String line;
     AVLTree<String, LinkedList<IndexTuple>> avlTree;
     AVLNode<String, LinkedList<IndexTuple>> avlNode;
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable = new HashTable<String, AVLTree<String, LinkedList<IndexTuple>>>();
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashTable = new HashTable<AVLTree<String, LinkedList<IndexTuple>>>();
     int i = 1;
     while ((line = reader.readLine()) != null) {
       for (int j = 0; j < line.length() - 5; j++) {
@@ -96,7 +96,7 @@ public class Matching {
 
   private static void printAvlTree(
     String hashIndex,
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashTable
   ) {
     AVLTree<String, LinkedList<IndexTuple>> avlTree;
     avlTree = hashTable.get(Integer.parseInt(hashIndex));
@@ -109,7 +109,7 @@ public class Matching {
 
   private static void printLinkedList(
     String subString,
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashTable
   ) {
     try {
       AVLTree<String, LinkedList<IndexTuple>> avlTree;
@@ -169,7 +169,7 @@ public class Matching {
 
   private static void addNewLine(
     String newLine,
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable,
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashTable,
     LinkedList<String> fileLine
   ) {
     AVLTree<String, LinkedList<IndexTuple>> avlTree;
@@ -204,12 +204,12 @@ public class Matching {
     System.out.println(fileLine.numitems);
   }
 
-  private static HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> deleteSubstring(
+  private static HashTable<AVLTree<String, LinkedList<IndexTuple>>> deleteSubstring(
     String substring,
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> hashTable,
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> hashTable,
     LinkedList<String> fileLine
   ) {
-    HashTable<String, AVLTree<String, LinkedList<IndexTuple>>> newHashTable = new HashTable<>();
+    HashTable<AVLTree<String, LinkedList<IndexTuple>>> newHashTable = new HashTable<>();
     AVLTree<String, LinkedList<IndexTuple>> avlTree = hashTable.get(
       asciiSumModulo(substring)
     );
@@ -676,7 +676,7 @@ class AVLTree<T extends Comparable<T>, V> {
   }
 }
 
-class HashTable<K, V> {
+class HashTable<V> {
 
   private static final int DEFAULT_SIZE = 100;
   private V[] hashTable;
