@@ -305,7 +305,7 @@ class LinkedListNode<T extends Comparable<T>> {
 }
 
 // Class : linked list
-class LinkedList<T extends Comparable<T>> {
+//class LinkedList<T extends Comparable<T>> {
 
   LinkedListNode<T> head; // dummy head
   int numitems;
@@ -374,7 +374,7 @@ class LinkedList<T extends Comparable<T>> {
   }
 
   // Method : copy linked list and return it
-  public LinkedList<T> copy() {
+  //public LinkedList<T> copy() {
     // Create a new linked list with the same value
     LinkedList<T> newList = new LinkedList<>();
     newList.numitems = this.numitems;
