@@ -30,7 +30,11 @@ public class Station {
         return this.transferTime;
     }
 
-    public void addLine(Edge newLine) {
+    public LinkedList<Edge> getEdges() {
+        return this.adjacentLines;
+    }
+
+    public void addEdge(Edge newLine) {
         this.adjacentLines.add(newLine);
     }
 

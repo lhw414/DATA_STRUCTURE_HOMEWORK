@@ -1,11 +1,27 @@
 public class Edge {
-    Station start;
-    Station end;
-    int travelTime;
+    String startStationId;
+    String endStationId;
+    int weight;
 
-    Edge(Station start, Station end, String subwayLine, int travelTime) {
-        this.start = start;
-        this.end = end;
-        this.travelTime = travelTime;
+    Edge(String startStationId, String endStationId, int weight) {
+        this.startStationId = startStationId;
+        this.endStationId = endStationId;
+        this.weight = weight;
+    }
+
+    public String getstartStation() {
+        return this.startStationId;
+    }
+
+    public String getendStation() {
+        return this.endStationId;
+    }
+
+    public int getTravelTime() {
+        return this.weight;
+    }
+
+    public void updateTravelTime(int travelTime) {
+        this.weight = travelTime;
     }
 }
