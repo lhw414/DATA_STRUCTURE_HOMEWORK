@@ -6,17 +6,19 @@ public class Graph {
     private HashMap<String, List<Station>> sameName;
     private HashMap<String, List<Edge>> transferLine;
     
-    public Graph() {
+    public Graph() { // constructor
         this.stationNames = new HashSet<>();
         this.idToStation = new HashMap<>();
         this.sameName = new HashMap<>();
         this.transferLine = new HashMap<>();
     }
 
+    // Function : get sameName list
     public List<Station> getSameNameList(String stationName) {
         return this.sameName.get(stationName);
     }
 
+    // Function : add station when same name not exist
     public void addStation(Station newStation) {
         this.stationNames.add(newStation.getName());
         this.idToStation.put(newStation.getId(), newStation);
@@ -27,6 +29,7 @@ public class Graph {
         this.transferLine.put(newStation.getName(), transferLineList);
     }
 
+    // Function : add station when same name exist
     public void addDuplicateStation(Station newStation) {
         this.idToStation.put(newStation.getId(), newStation);
 
