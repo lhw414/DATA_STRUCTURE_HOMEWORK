@@ -5,3 +5,9 @@
 ### HW2 : LINKEDLIST DB
 
 ### HW3 : STACK CALCULATOR
+
+### HW4 : SORTING
+
+### HW5 : AVL TREE
+
+### HW6 : SUBWAY
